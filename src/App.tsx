@@ -1,396 +1,463 @@
 import { useState } from 'react'
+import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar'
+import { MdDashboard, MdAttachMoney, MdBarChart, MdSettings, MdMenu, MdTrendingUp, MdTrendingDown } from 'react-icons/md'
+import { TransactionProvider, useTransactions } from './context/TransactionContext'
+import TransactionForm from './components/Forms/TransactionForm'
+import TransactionList from './components/Forms/TransactionList'
+import FinancialCharts from './components/Charts/FinancialCharts'
+import Modal from './components/UI/Modal'
+import type { TransactionFormData } from './components/Forms/TransactionForm'
 import './App.css'
-import { ExpenseProvider, useExpenses, useCategories } from './context/ExpenseContext'
-import { SAMPLE_EXPENSES } from './utils/sampleData'
-import { SidebarNavigation } from './components/Sidebar/SidebarNavigation'
-import { 
-  MdDashboard, 
-  MdReceipt,
-  MdCategory,
-  MdBarChart,
-  MdSettings,
-  MdAttachMoney,
-  MdDescription,
-  MdTrendingUp,
-  MdPlaylistAdd
-} from 'react-icons/md'// Componente principal da aplicação
-function AppContent() {
-  const [currentView, setCurrentView] = useState('dashboard')
-  const { expenses, getTotalAmount, addExpense } = useExpenses()
-  const { categories } = useCategories()
 
-  // Função para carregar dados de exemplo
-  const loadSampleData = () => {
-    SAMPLE_EXPENSES.forEach(expense => {
-      addExpense(expense)
-    })
-  }
+type Page = 'dashboard' | 'transactions' | 'charts' | 'settings'
 
-  const renderContent = () => {
-    switch (currentView) {
+function App() {
+  const [currentPage, setCurrentPage] = useState<Page>('dashboard')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  const renderPage = () => {
+    switch (currentPage) {
       case 'dashboard':
-        return (
-          <div style={{ 
-            backgroundColor: '#f8fafc', 
-            padding: '24px', 
-            borderRadius: '12px',
-            marginTop: '20px'
-          }}>
-            <h2 style={{ color: '#1e293b', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MdDashboard size={24} />
-              Dashboard
-            </h2>
-            
-            {/* Cards de resumo */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '16px',
-              marginBottom: '32px'
-            }}>
-              <div style={{
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '32px', color: '#ef4444', marginBottom: '8px' }}>
-                  <MdAttachMoney size={32} />
-                </div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b' }}>
-                  R$ {getTotalAmount().toFixed(2)}
-                </div>
-                <div style={{ color: '#64748b', fontSize: '14px' }}>Total Gastos</div>
-              </div>
-              
-              <div style={{
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '32px', color: '#3b82f6', marginBottom: '8px' }}>
-                  <MdDescription size={32} />
-                </div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b' }}>
-                  {expenses.length}
-                </div>
-                <div style={{ color: '#64748b', fontSize: '14px' }}>Total Registros</div>
-              </div>
-              
-              <div style={{
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '32px', color: '#10b981', marginBottom: '8px' }}>
-                  <MdCategory size={32} />
-                </div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b' }}>
-                  {categories.length}
-                </div>
-                <div style={{ color: '#64748b', fontSize: '14px' }}>Categorias</div>
-              </div>
-            </div>
-
-            {/* Lista de gastos recentes */}
-            {expenses.length > 0 ? (
-              <div style={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                overflow: 'hidden'
-              }}>
-                <div style={{ 
-                  padding: '16px', 
-                  borderBottom: '1px solid #e2e8f0',
-                  backgroundColor: '#f8fafc' 
-                }}>
-                  <h3 style={{ margin: 0, color: '#1e293b' }}>Gastos Recentes</h3>
-                </div>
-                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                  {expenses.slice(-5).reverse().map((expense) => (
-                    <div key={expense.id} style={{
-                      padding: '12px 16px',
-                      borderBottom: '1px solid #f1f5f9',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
-                      <div>
-                        <div style={{ fontWeight: '500', color: '#1e293b' }}>
-                          {expense.title}
-                        </div>
-                        <div style={{ fontSize: '14px', color: '#64748b' }}>
-                          {new Date(expense.date).toLocaleDateString('pt-BR')}
-                        </div>
-                      </div>
-                      <div style={{ 
-                        fontWeight: 'bold', 
-                        color: '#ef4444',
-                        fontSize: '16px'
-                      }}>
-                        R$ {expense.amount.toFixed(2)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div style={{
-                backgroundColor: 'white',
-                padding: '40px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                textAlign: 'center',
-                color: '#64748b'
-              }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>
-                  <MdBarChart size={48} color="#64748b" />
-                </div>
-                <h3 style={{ color: '#94a3b8', marginBottom: '8px' }}>Nenhum gasto registrado</h3>
-                <p style={{ marginBottom: '20px' }}>Comece adicionando seus primeiros gastos para ver estatísticas aqui.</p>
-                <button
-                  onClick={loadSampleData}
-                  style={{
-                    backgroundColor: '#3b82f6',
-                    color: 'white',
-                    border: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    fontSize: '14px'
-                  }}
-                >
-                  <MdPlaylistAdd size={16} style={{ marginRight: '8px' }} />
-                  Carregar Dados de Exemplo
-                </button>
-              </div>
-            )}
-          </div>
-        )
-      
-      case 'expenses':
-        return (
-          <div style={{ 
-            backgroundColor: '#fef3c7', 
-            padding: '20px', 
-            borderRadius: '8px',
-            marginTop: '20px'
-          }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MdReceipt size={24} />
-              Gerenciar Gastos
-            </h2>
-            <p>Em breve: Formulário para adicionar, editar e deletar gastos.</p>
-          </div>
-        )
-      
-      case 'categories':
-        return (
-          <div style={{ 
-            backgroundColor: '#f0f4ff', 
-            padding: '20px', 
-            borderRadius: '8px',
-            marginTop: '20px'
-          }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MdCategory size={24} />
-              Gerenciar Categorias
-            </h2>
-            <p>Em breve: Gerenciamento de categorias com cores personalizadas.</p>
-            <div style={{ marginTop: '20px' }}>
-              <strong>Categorias disponíveis:</strong>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
-                {categories.map(category => (
-                  <div key={category.id} style={{
-                    backgroundColor: category.color + '20',
-                    color: category.color,
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '14px',
-                    border: `1px solid ${category.color}40`
-                  }}>
-                    {category.name}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-        
-      case 'reports':
-        return (
-          <div style={{ 
-            backgroundColor: '#f0fdf4', 
-            padding: '20px', 
-            borderRadius: '8px',
-            marginTop: '20px'
-          }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MdBarChart size={24} />
-              Relatórios
-            </h2>
-            <p>Em breve: Relatórios detalhados com gráficos e análises.</p>
-          </div>
-        )
-
+        return <Dashboard />
+      case 'transactions':
+        return <FilteredTransactions />
+      case 'charts':
+        return <FinancialCharts />
       case 'settings':
-        return (
-          <div style={{ 
-            backgroundColor: '#f8fafc', 
-            padding: '20px', 
-            borderRadius: '8px',
-            marginTop: '20px'
-          }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MdSettings size={24} />
-              Configurações
-            </h2>
-            <p>Em breve: Configurações do sistema e preferências do usuário.</p>
-          </div>
-        )
-        
+        return <Settings />
       default:
-        return (
-          <div style={{ 
-            backgroundColor: '#f3f4f6', 
-            padding: '20px', 
-            borderRadius: '8px',
-            marginTop: '20px'
-          }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MdTrendingUp size={24} />
-              Sistema Funcionando!
-            </h2>
-            <p>Context API configurado e funcionando!</p>
-          </div>
-        )
+        return <Dashboard />
     }
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Sidebar */}
-      <SidebarNavigation 
-        currentView={currentView} 
-        onViewChange={setCurrentView} 
-      />
-      
-      {/* Main Content Area */}
-      <div style={{ 
-        flex: 1, 
-        overflow: 'auto',
-        backgroundColor: '#f8fafc',
-        minHeight: '100vh'
-      }}>
-        {/* Header */}
-        <header style={{ 
-          backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #e2e8f0',
-          padding: '16px 24px',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <h1 style={{ 
-                margin: 0, 
-                color: '#1e293b', 
-                fontSize: '24px', 
-                fontWeight: '600' 
-              }}>
-                {currentView === 'dashboard' && (
-                  <>
-                    <MdDashboard size={20} style={{ marginRight: '8px' }} />
-                    Dashboard
-                  </>
-                )}
-                {currentView === 'expenses' && (
-                  <>
-                    <MdReceipt size={20} style={{ marginRight: '8px' }} />
-                    Gerenciar Gastos
-                  </>
-                )}
-                {currentView === 'categories' && (
-                  <>
-                    <MdCategory size={20} style={{ marginRight: '8px' }} />
-                    Gerenciar Categorias
-                  </>
-                )}
-                {currentView === 'reports' && (
-                  <>
-                    <MdBarChart size={20} style={{ marginRight: '8px' }} />
-                    Relatórios
-                  </>
-                )}
-                {currentView === 'settings' && (
-                  <>
-                    <MdSettings size={20} style={{ marginRight: '8px' }} />
-                    Configurações
-                  </>
-                )}
-              </h1>
-              <p style={{ 
-                margin: '4px 0 0 0', 
-                color: '#64748b', 
-                fontSize: '14px' 
-              }}>
-                {currentView === 'dashboard' && 'Visão geral dos seus gastos e estatísticas'}
-                {currentView === 'expenses' && 'Adicione, edite e gerencie seus gastos'}
-                {currentView === 'categories' && 'Organize suas categorias de gastos'}
-                {currentView === 'reports' && 'Análises detalhadas e relatórios'}
-                {currentView === 'settings' && 'Configurações do sistema'}
-              </p>
-            </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                backgroundColor: '#f1f5f9',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontSize: '14px',
-                color: '#475569',
-                fontWeight: '500'
-              }}>
-                {categories.length} categorias
-              </div>
-              <div style={{
-                backgroundColor: expenses.length > 0 ? '#dcfce7' : '#fef3c7',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontSize: '14px',
-                color: expenses.length > 0 ? '#166534' : '#92400e',
-                fontWeight: '500'
-              }}>
-                {expenses.length} gastos
-              </div>
-            </div>
+    <TransactionProvider>
+      <div className="app-container" style={{ display: 'flex', height: '100vh' }}>
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          width="280px"
+          collapsedWidth="80px"
+          backgroundColor="#212038"
+          rootStyles={{
+            color: '#FFFFFF'
+          }}
+        >
+          {/* Header do Sidebar */}
+          <div style={{ 
+            padding: '20px',
+            textAlign: 'center',
+            borderBottom: '1px solid #3a3a5c',
+            backgroundColor: '#212038'
+          }}>
+            <h2 style={{ 
+              color: '#FFFFFF',
+              margin: 0,
+              fontSize: sidebarCollapsed ? '14px' : '18px',
+              fontWeight: 'bold'
+            }}>
+              {sidebarCollapsed ? 'LE' : 'Luminare Eventos'}
+            </h2>
           </div>
-        </header>
+          
+          {/* Menu Items */}
+          <Menu
+            menuItemStyles={{
+              button: ({ active }) => ({
+                backgroundColor: active ? '#3a3a5c' : 'transparent',
+                color: '#FFFFFF',
+                '&:hover': {
+                  backgroundColor: '#3a3a5c'
+                }
+              })
+            }}
+          >
+            <MenuItem
+              icon={<MdDashboard />}
+              onClick={() => setCurrentPage('dashboard')}
+              active={currentPage === 'dashboard'}
+            >
+              Dashboard
+            </MenuItem>
+            
+            <MenuItem
+              icon={<MdAttachMoney />}
+              onClick={() => setCurrentPage('transactions')}
+              active={currentPage === 'transactions'}
+            >
+              Transações
+            </MenuItem>
+            
+            <MenuItem
+              icon={<MdBarChart />}
+              onClick={() => setCurrentPage('charts')}
+              active={currentPage === 'charts'}
+            >
+              Relatórios
+            </MenuItem>
+            
+            <MenuItem
+              icon={<MdSettings />}
+              onClick={() => setCurrentPage('settings')}
+              active={currentPage === 'settings'}
+            >
+              Configurações
+            </MenuItem>
+          </Menu>
+        </Sidebar>
 
-        {/* Content */}
-        <main style={{ padding: '24px', minHeight: 'calc(100vh - 88px)' }}>
-          {renderContent()}
-        </main>
+        <div className="main-content" style={{ 
+          flex: 1,
+          padding: '20px',
+          backgroundColor: '#f5f5f5',
+          overflow: 'auto'
+        }}>
+          <AppContent 
+            currentPage={currentPage}
+            sidebarCollapsed={sidebarCollapsed}
+            setSidebarCollapsed={setSidebarCollapsed}
+          />
+          {renderPage()}
+        </div>
+      </div>
+    </TransactionProvider>
+  )
+}
+
+function AppContent({ 
+  currentPage, 
+  sidebarCollapsed, 
+  setSidebarCollapsed 
+}: {
+  currentPage: Page
+  sidebarCollapsed: boolean
+  setSidebarCollapsed: (collapsed: boolean) => void
+}) {
+  const getPageTitle = () => {
+    switch (currentPage) {
+      case 'dashboard': return 'Dashboard'
+      case 'transactions': return 'Gestão de Transações'
+      case 'charts': return 'Relatórios Financeiros'
+      case 'settings': return 'Configurações'
+      default: return 'Dashboard'
+    }
+  }
+
+  return (
+    <div className="page-header" style={{ marginBottom: '20px' }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        padding: '15px 20px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        <h1 style={{ margin: 0, color: '#333' }}>{getPageTitle()}</h1>
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          style={{
+            background: '#212038',
+            color: '#FFFFFF',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}
+        >
+          <MdMenu />
+          {sidebarCollapsed ? 'Expandir' : 'Recolher'}
+        </button>
       </div>
     </div>
   )
 }
 
-// Componente App com Provider
-function App() {
+function Dashboard() {
   return (
-    <ExpenseProvider>
-      <AppContent />
-    </ExpenseProvider>
+    <div className="dashboard">
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '20px',
+        marginBottom: '30px'
+      }}>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          padding: '20px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{ color: '#333', marginBottom: '15px' }}>Resumo Financeiro</h3>
+          <FinancialCharts />
+        </div>
+        
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          padding: '20px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{ color: '#333', marginBottom: '15px' }}>Transações Recentes</h3>
+          <TransactionList />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function FilteredTransactions() {
+  const { addTransaction, updateTransaction } = useTransactions()
+  const [showForm, setShowForm] = useState(false)
+  const [editingTransaction, setEditingTransaction] = useState<any>(null)
+  const [transactionType, setTransactionType] = useState<'entrada' | 'saida' | null>(null)
+
+  const handleAddEntrada = () => {
+    setEditingTransaction(null)
+    setTransactionType('entrada')
+    setShowForm(true)
+  }
+
+  const handleAddSaida = () => {
+    setEditingTransaction(null)
+    setTransactionType('saida')
+    setShowForm(true)
+  }
+
+  const handleCloseForm = () => {
+    setShowForm(false)
+    setEditingTransaction(null)
+    setTransactionType(null)
+  }
+
+  const handleSubmit = (data: TransactionFormData) => {
+    try {
+      if (editingTransaction) {
+        // Editando transação existente
+        updateTransaction(editingTransaction.id, data)
+        console.log('Transação atualizada:', data)
+      } else {
+        // Criando nova transação
+        addTransaction({
+          title: data.title,
+          description: data.description,
+          amount: data.amount,
+          type: data.type,
+          category: data.category,
+          date: data.date
+        })
+        console.log('Nova transação criada:', data)
+      }
+      handleCloseForm()
+    } catch (error) {
+      console.error('Erro ao salvar transação:', error)
+    }
+  }
+
+  return (
+    <div className="transactions-page">
+      {/* Seção de Controle de Entradas e Saídas */}
+      <div style={{ 
+        marginBottom: '30px',
+        padding: '20px',
+        backgroundColor: '#FFFFFF',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        <h3 style={{ 
+          color: '#333', 
+          marginBottom: '20px',
+          fontSize: '18px',
+          fontWeight: 'bold'
+        }}>
+          Controle de Entradas e Saídas
+        </h3>
+        
+        {/* Container de Botões com Layout Responsivo */}
+        <div style={{ 
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '16px',
+          justifyContent: 'center',
+          alignItems: 'stretch'
+        }}>
+          {/* Botão Adicionar Entrada */}
+          <button
+            onClick={handleAddEntrada}
+            style={{
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#FFFFFF',
+              border: 'none',
+              padding: '20px',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+              transition: 'all 0.3s ease',
+              minWidth: '220px',
+              flex: '1 1 300px',
+              maxWidth: '400px'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.35)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.25)'
+            }}
+          >
+            <MdTrendingUp size={28} />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '18px', marginBottom: '4px' }}>Nova Entrada</div>
+              <div style={{ fontSize: '13px', opacity: 0.9, fontWeight: '400' }}>Receitas e ganhos</div>
+            </div>
+          </button>
+
+          {/* Botão Adicionar Saída */}
+          <button
+            onClick={handleAddSaida}
+            style={{
+              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+              color: '#FFFFFF',
+              border: 'none',
+              padding: '20px',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)',
+              transition: 'all 0.3s ease',
+              minWidth: '220px',
+              flex: '1 1 300px',
+              maxWidth: '400px'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.35)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.25)'
+            }}
+          >
+            <MdTrendingDown size={28} />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '18px', marginBottom: '4px' }}>Nova Saída</div>
+              <div style={{ fontSize: '13px', opacity: 0.9, fontWeight: '400' }}>Custos e despesas</div>
+            </div>
+          </button>
+        </div>
+
+        {/* Informações das Categorias */}
+        <div style={{ 
+          marginTop: '24px',
+          padding: '20px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          borderLeft: '4px solid #212038'
+        }}>
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '24px',
+            fontSize: '14px',
+            color: '#666'
+          }}>
+            <div>
+              <h5 style={{ 
+                color: '#059669', 
+                margin: '0 0 12px 0', 
+                fontSize: '15px', 
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <MdTrendingUp size={18} />
+                Categorias de Entrada:
+              </h5>
+              <ul style={{ margin: 0, paddingLeft: '26px', lineHeight: '1.6' }}>
+                <li>Mini-Festa</li>
+                <li>Pegue e Monte</li>
+                <li>Kit Mêsversário</li>
+              </ul>
+            </div>
+            <div>
+              <h5 style={{ 
+                color: '#dc2626', 
+                margin: '0 0 12px 0', 
+                fontSize: '15px', 
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <MdTrendingDown size={18} />
+                Categorias de Saída:
+              </h5>
+              <ul style={{ margin: 0, paddingLeft: '26px', lineHeight: '1.6' }}>
+                <li>Arco Redondo</li>
+                <li>Arco Romano</li>
+                <li>Bandejas</li>
+                <li>Capa Cilindro</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal do Formulário */}
+      <Modal
+        isOpen={showForm}
+        onClose={handleCloseForm}
+        title={transactionType === 'entrada' ? '💰 Nova Entrada' : '💸 Nova Saída'}
+        size="lg"
+      >
+        <TransactionForm
+          transaction={editingTransaction}
+          onSubmit={handleSubmit}
+          onCancel={handleCloseForm}
+        />
+      </Modal>      {/* Lista de Transações */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        overflow: 'hidden'
+      }}>
+        <TransactionList />
+      </div>
+    </div>
+  )
+}
+
+function Settings() {
+  return (
+    <div style={{
+      backgroundColor: '#FFFFFF',
+      padding: '20px',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <h3 style={{ color: '#333', marginBottom: '15px' }}>Configurações do Sistema</h3>
+      <div style={{ color: '#666' }}>
+        <p>• Tema da aplicação</p>
+        <p>• Configurações de backup</p>
+        <p>• Preferências de relatório</p>
+        <p>• Configurações de notificação</p>
+      </div>
+    </div>
   )
 }
 

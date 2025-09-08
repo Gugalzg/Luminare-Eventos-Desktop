@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar'
 import { 
   MdDashboard,
-  MdReceipt, 
+  MdTrendingUp,
+  MdTrendingDown, 
   MdCategory,
   MdBarChart,
   MdSettings,
@@ -67,7 +68,7 @@ export function SidebarNavigation({ currentView, onViewChange }: SidebarNavigati
                 fontSize: '12px',
                 marginTop: '4px'
               }}>
-                Controle de Gastos
+                Controle Financeiro
               </p>
             </div>
           )}
@@ -134,13 +135,22 @@ export function SidebarNavigation({ currentView, onViewChange }: SidebarNavigati
               Dashboard
             </MenuItem>
 
-            {/* Gastos */}
+            {/* Entradas */}
             <MenuItem
-              icon={<MdReceipt size={20} />}
-              active={currentView === 'expenses'}
-              onClick={() => onViewChange('expenses')}
+              icon={<MdTrendingUp size={20} />}
+              active={currentView === 'entradas'}
+              onClick={() => onViewChange('entradas')}
             >
-              Gastos
+              Entradas
+            </MenuItem>
+
+            {/* Saídas */}
+            <MenuItem
+              icon={<MdTrendingDown size={20} />}
+              active={currentView === 'saidas'}
+              onClick={() => onViewChange('saidas')}
+            >
+              Saídas
             </MenuItem>
 
             {/* Categorias */}

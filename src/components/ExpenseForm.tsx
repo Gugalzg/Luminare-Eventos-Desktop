@@ -187,7 +187,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400"
+              className="flex-1 bg-white-300 text-white-700 py-2 rounded hover:bg-white-400"
             >
               Cancelar
             </button>

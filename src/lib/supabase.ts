@@ -1,20 +1,87 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Substitua pelas suas credenciais do Supabase
-const supabaseUrl = 'YOUR_SUPABASE_URL'
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY'
+// Configurações do Supabase usando variáveis de ambiente
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'YOUR_SUPABASE_URL'
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY'
+
+// Debug das variáveis (remover em produção)
+console.log('Supabase URL:', supabaseUrl)
+console.log('Supabase Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'undefined')
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Função para testar a conexão com o Supabase
+export const testConnection = async () => {
+  try {
+    // Primeiro, verifica se o supabase está configurado
+    if (!isSupabaseConfigured()) {
+      return { 
+        success: false, 
+        error: 'Supabase não configurado. Configure as variáveis de ambiente primeiro.' 
+      }
+    }
+
+    // Testa a conexão usando uma função do sistema que sempre existe
+    const { error } = await supabase
+      .from('information_schema.tables')
+      .select('table_name')
+      .limit(1)
+    
+    if (error) {
+      // Se der erro de autenticação ou conexão
+      return { success: false, error: error.message }
+    }
+    
+    return { 
+      success: true, 
+      message: 'Conexão com Supabase estabelecida com sucesso!',
+      info: 'Autenticação e conectividade verificadas'
+    }
+  } catch (err: any) {
+    console.log('Erro de conexão:', err)
+    return { success: false, error: err.message || 'Erro de conexão com o banco de dados' }
+  }
+}
+
+// Função para verificar se o Supabase está configurado
+export const isSupabaseConfigured = () => {
+  return supabaseUrl !== 'YOUR_SUPABASE_URL' && 
+         supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY'
+}
+
+// Função para testar a estrutura das tabelas
+export const testTableStructure = async () => {
+  try {
+    const { data: transactionsData, error: transactionsError } = await supabase
+      .from('transactions')
+      .select('*')
+      .limit(1)
+    
+    const { data: categoriesData, error: categoriesError } = await supabase
+      .from('categories')
+      .select('*')
+      .limit(1)
+
+    return {
+      success: true,
+      transactions: { data: transactionsData, error: transactionsError },
+      categories: { data: categoriesData, error: categoriesError }
+    }
+  } catch (err) {
+    return { success: false, error: err }
+  }
+}
 
 export type Database = {
   public: {
     Tables: {
-      expenses: {
+      transactions: {
         Row: {
           id: string
           title: string
           description: string | null
           amount: number
+          type: 'entrada' | 'saida'
           category: string
           date: string
           created_at: string
@@ -25,6 +92,7 @@ export type Database = {
           title: string
           description?: string | null
           amount: number
+          type: 'entrada' | 'saida'
           category: string
           date: string
           created_at?: string
@@ -35,6 +103,7 @@ export type Database = {
           title?: string
           description?: string | null
           amount?: number
+          type?: 'entrada' | 'saida'
           category?: string
           date?: string
           created_at?: string
@@ -45,6 +114,7 @@ export type Database = {
         Row: {
           id: string
           name: string
+          type: 'entrada' | 'saida'
           color: string
           icon: string
           created_at: string
@@ -53,6 +123,7 @@ export type Database = {
         Insert: {
           id?: string
           name: string
+          type: 'entrada' | 'saida'
           color: string
           icon: string
           created_at?: string
@@ -61,6 +132,7 @@ export type Database = {
         Update: {
           id?: string
           name?: string
+          type?: 'entrada' | 'saida'
           color?: string
           icon?: string
           created_at?: string
