@@ -135,13 +135,20 @@ const FinancialCharts: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Entradas do Mês</p>
+              <p className="text-sm text-gray-600" style={{ fontWeight: 700 }}>Entradas do Mês<TrendingUp 
+                className="h-8 w-8 text-red-600" 
+                style={{ 
+                  position: 'relative',
+                  top: '7px',
+                  left: '6px'
+                }} 
+              /> </p>
               <p className="text-2xl font-bold text-green-600">
                 {formatCurrency(stats.entradas)}
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
-              <TrendingUp className="h-6 w-6 text-green-600" />
+              
             </div>
           </div>
         </div>
@@ -150,13 +157,19 @@ const FinancialCharts: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Saídas do Mês</p>
+              <p className="text-sm font-bold text-gray-600" style={{ fontWeight: 700}}>Saídas do Mês<TrendingDown 
+                className="h-8 w-8 text-red-600" 
+                style={{ 
+                  position: 'relative',
+                  top: '8px',
+                  left: '6px'
+                }} 
+              /> </p>
               <p className="text-2xl font-bold text-red-600">
                 {formatCurrency(stats.saidas)}
               </p>
             </div>
             <div className="p-3 bg-red-100 rounded-full">
-              <TrendingDown className="h-6 w-6 text-red-600" />
             </div>
           </div>
         </div>
@@ -165,13 +178,12 @@ const FinancialCharts: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Saldo do Mês</p>
+              <p className="text-sm font-medium text-gray-600" style={{ fontWeight: 700 }}>Saldo do Mês</p>
               <p className={`text-2xl font-bold ${stats.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {stats.saldo >= 0 ? '+' : '-'}{formatCurrency(stats.saldo)}
               </p>
             </div>
             <div className={`p-3 rounded-full ${stats.saldo >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-              <DollarSign className={`h-6 w-6 ${stats.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`} />
             </div>
           </div>
         </div>
@@ -180,13 +192,13 @@ const FinancialCharts: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Transações</p>
+              <p className="text-sm font-medium text-gray-600" style={{ fontWeight: 700 }}>Número de Transações</p>
               <p className="text-2xl font-bold text-blue-600">
                 {stats.totalTransactions}
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
-              <PieChartIcon className="h-6 w-6 text-blue-600" />
+             
             </div>
           </div>
         </div>

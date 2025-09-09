@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar'
-import { MdDashboard, MdAttachMoney, MdBarChart, MdSettings, MdMenu, MdTrendingUp, MdTrendingDown } from 'react-icons/md'
+import { MdAttachMoney, MdBarChart, MdSettings, MdMenu, MdTrendingUp, MdTrendingDown } from 'react-icons/md'
 import { TransactionProvider, useTransactions } from './context/TransactionContext'
 import TransactionForm from './components/Forms/TransactionForm'
 import TransactionList from './components/Forms/TransactionList'
@@ -71,14 +71,7 @@ function App() {
               })
             }}
           >
-            <MenuItem
-              icon={<MdDashboard />}
-              onClick={() => setCurrentPage('dashboard')}
-              active={currentPage === 'dashboard'}
-            >
-              Dashboard
-            </MenuItem>
-            
+               
             <MenuItem
               icon={<MdAttachMoney />}
               onClick={() => setCurrentPage('transactions')}
@@ -193,16 +186,6 @@ function Dashboard() {
         }}>
           <h3 style={{ color: '#333', marginBottom: '15px' }}>Resumo Financeiro</h3>
           <FinancialCharts />
-        </div>
-        
-        <div style={{
-          backgroundColor: '#FFFFFF',
-          padding: '20px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ color: '#333', marginBottom: '15px' }}>Transações Recentes</h3>
-          <TransactionList />
         </div>
       </div>
     </div>
@@ -428,6 +411,7 @@ function FilteredTransactions() {
           transaction={editingTransaction}
           onSubmit={handleSubmit}
           onCancel={handleCloseForm}
+          initialType={transactionType || undefined}
         />
       </Modal>      {/* Lista de Transações */}
       <div style={{
