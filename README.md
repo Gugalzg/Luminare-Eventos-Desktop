@@ -1,265 +1,314 @@
-# React + TypeScript + Vite
+# 💰 Luminare Eventos - Sistema de Gestão Financeira
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div align="center">
+  <img src="src/assets/logo.png" alt="Luminare Eventos" width="120" height="120" style="border-radius: 12px;">
+  <h3>Sistema Desktop de Controle Financeiro para Empresa de Eventos</h3>
+  
+  ![Tauri](https://img.shields.io/badge/Tauri-2.8.5-blue)
+  ![React](https://img.shields.io/badge/React-19.1.1-blue)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)
+  ![Supabase](https://img.shields.io/badge/Supabase-2.57.2-green)
+  ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.13-blue)
+</div>
 
-Currently, two official plugins are available:
+## 📖 Sobre o Projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+O **Luminare Eventos** é um sistema desktop moderno para gestão financeira de empresas de eventos, desenvolvido com **Tauri + React + TypeScript**. O sistema oferece controle completo de entradas e saídas financeiras, com categorias específicas para o ramo de eventos e relatórios visuais detalhados.
 
-## Expanding the ESLint configuration
+### 🎯 Características Principais
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **💼 Gestão Financeira Completa**: Controle de entradas e saídas categorizadas
+- **📊 Relatórios Visuais**: Gráficos interativos e dashboards
+- **🏢 Categorias Específicas**: Adaptado para empresas de eventos
+- **💾 Persistência de Dados**: Integração com Supabase e backup local
+- **🖥️ Aplicativo Desktop**: Interface nativa multiplataforma
+- **🎨 Interface Moderna**: Design responsivo e intuitivo
 
-```js
-# Luminare Eventos - Sistema de Controle Financeiro
-
-Sistema completo de controle financeiro desenvolvido especificamente para a empresa **Luminare Eventos**, utilizando as tecnologias mais modernas para gestão de receitas e despesas.
-
-## 🚀 Funcionalidades Implementadas
-
-### ✅ Dashboard Executivo
-- **Cards de Resumo**: Visualização total de Entradas, Saídas e Lucro
-- **Transações Recentes**: Lista das últimas 5 transações
-- **Indicadores Visuais**: Cores diferenciadas para entrada (verde) e saída (vermelho)
-
-### ✅ Sistema de Navegação
-- **Sidebar Profissional**: Menu lateral com react-pro-sidebar
-- **Menu Responsivo**: Adaptável para dispositivos móveis
-- **Navegação por Seções**: Dashboard, Entradas, Saídas, Gerenciar, Relatórios
-
-### ✅ Formulários CRUD Completos
-- **React Hook Form**: Validação profissional com TypeScript
-- **Modal de Criação/Edição**: Interface intuitiva para transações
-- **Validação Robusta**: Campos obrigatórios, formatos corretos
-- **Feedback Visual**: Mensagens de erro e sucesso
-
-### ✅ Gestão de Transações
-- **Lista Completa**: Tabela com todas as transações
-- **Filtros Inteligentes**: Por tipo (Entrada/Saída) ou visualização completa
-- **Ações CRUD**: Criar, Visualizar, Editar, Excluir
-- **Modal de Detalhes**: Visualização completa da transação
-
-### ✅ Categorias Específicas do Negócio
-
-#### 📈 **Entradas (Receitas)**
-- **Mini-Festa**: Eventos temáticos personalizados
-- **Pegue e Monte**: Kit para decoração DIY  
-- **Kit Mêsversário**: Decoração para aniversário mensal
-
-#### 📉 **Saídas (Custos)**
-- **Arco Redondo**: Material decorativo circular
-- **Arco Romano**: Decoração em estilo clássico
-- **Bandejas**: Utensílios para apresentação
-- **Capa Cilindro**: Cobertura para elementos cilíndricos
-
-### ✅ Relatórios e Gráficos
-- **Recharts Integration**: Biblioteca de gráficos profissional
-- **Gráfico de Barras Mensal**: Comparação Entradas vs Saídas
-- **Gráfico de Pizza**: Distribuição por categoria
-- **Evolução do Saldo**: Linha temporal do acumulado
-- **Top Categorias**: Ranking das maiores movimentações
-- **Cards de Resumo**: Métricas principais sempre visíveis
-
-### ✅ Persistência de Dados
-- **LocalStorage**: Armazenamento local dos dados
-- **Context API**: Gerenciamento de estado global
-- **Funções Calculadas**: Totalizações automáticas em tempo real
-
-## 🛠 Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas
 
 ### Frontend
-- **React 19** + **TypeScript**: Framework moderno com tipagem forte
-- **Vite**: Build tool de alta performance
-- **Tailwind CSS**: Framework CSS utility-first
+- **React 19.1.1** - Framework principal
+- **TypeScript 5.8.3** - Tipagem estática
+- **TailwindCSS 4.1.13** - Estilização
+- **React Hook Form** - Formulários
+- **React Icons** - Ícones
+- **Recharts** - Gráficos e visualizações
+- **React Pro Sidebar** - Navegação lateral
 
-### Formulários e Validação
-- **React Hook Form**: Biblioteca de formulários performática
-- **Validação TypeScript**: Tipagem completa dos dados
+### Backend & Banco de Dados
+- **Supabase 2.57.2** - Backend as a Service
+- **PostgreSQL** - Banco de dados
+- **Row Level Security (RLS)** - Segurança
 
-### UI/UX
-- **react-pro-sidebar**: Sidebar profissional e responsiva
-- **react-icons/md**: Ícones Material Design
-- **Recharts**: Biblioteca de gráficos para React
+### Desktop & Build
+- **Tauri 2.8.5** - Framework para aplicações desktop
+- **Rust** - Backend nativo
+- **Vite 7.1.2** - Build tool
 
-### Desktop
-- **Tauri**: Framework para aplicações desktop nativas
+## 🚀 Funcionalidades
 
-## 📊 Estrutura de Dados
+### 💰 Gestão de Transações
+- ✅ **Entradas**: Mini-Festa, Pegue e Monte, Kit Mêsversário
+- ✅ **Saídas**: Arco Redondo, Arco Romano, Bandejas, Capa Cilindro
+- ✅ **CRUD Completo**: Criar, visualizar, editar e excluir transações
+- ✅ **Categorização**: Sistema de categorias por tipo de evento
+- ✅ **Filtros**: Por tipo, categoria e período
 
-```typescript
-interface Transaction {
-  id: string;
-  title: string;
-  description?: string;
-  amount: number;
-  type: 'entrada' | 'saida';
-  category: string;
-  date: string;
-  created_at: string;
-}
+### 📊 Relatórios e Análises
+- ✅ **Dashboard**: Visão geral dos dados financeiros
+- ✅ **Gráficos Interativos**: Visualização de entradas vs saídas
+- ✅ **Análise por Categoria**: Distribuição de gastos e receitas
+- ✅ **Cálculo de Lucro**: Receitas - Despesas em tempo real
 
-interface Category {
-  id: string;
-  name: string;
-  type: 'entrada' | 'saida';
-  color: string;
-  icon: string;
-  created_at: string;
-}
+### 🔧 Configurações e Administração
+- ✅ **Teste de Conexão**: Verificação do banco de dados
+- ✅ **Backup Local**: localStorage como fallback
+- ✅ **Sincronização**: Dados entre local e cloud
+- ✅ **Temas**: Interface customizável
+
+### 🖥️ Interface Desktop
+- ✅ **Sidebar Responsiva**: Navegação intuitiva com logo
+- ✅ **Formulários Modernos**: Validação em tempo real
+- ✅ **Modais Interativos**: Experiência fluida
+- ✅ **Design Responsivo**: Adaptável a diferentes telas
+
+## 📁 Estrutura do Projeto
+
+```
+Luminare-Eventos/
+├── 📂 src/
+│   ├── 📂 components/           # Componentes React
+│   │   ├── 📂 Charts/          # Gráficos e visualizações
+│   │   ├── 📂 Forms/           # Formulários de transação
+│   │   ├── 📂 Sidebar/         # Navegação lateral
+│   │   └── 📂 UI/              # Componentes de interface
+│   ├── 📂 context/             # Contextos React
+│   ├── 📂 services/            # Serviços de API
+│   ├── 📂 types/               # Definições TypeScript
+│   ├── 📂 utils/               # Utilitários
+│   └── 📂 assets/              # Assets estáticos
+├── 📂 src-tauri/               # Código Rust/Tauri
+│   ├── 📂 src/                 # Código fonte Rust
+│   ├── 📂 icons/               # Ícones da aplicação
+│   └── 📂 capabilities/        # Permissões Tauri
+├── 📂 database/                # Scripts SQL
+└── 📄 README.md               # Este arquivo
 ```
 
-## 🎯 Como Usar
+## ⚙️ Instalação e Configuração
 
-### 1. Instalação
-```bash
-npm install
-```
+### 📋 Pré-requisitos
+- **Node.js** 22.12+ 
+- **Rust** 1.77.2+
+- **Conta Supabase** (opcional, funciona offline)
 
-### 2. Executar em Desenvolvimento
-```bash
-npm run dev
-```
+### 🚀 Instalação
 
-### 3. Executar como Desktop (Tauri)
+1. **Clone o repositório**
+   ```bash
+   git clone https://github.com/Gugalzg/Luminare-Eventos-Desktop-1.git
+   cd Luminare-Eventos-Desktop-1
+   ```
+
+2. **Instale as dependências**
+   ```bash
+   npm install
+   ```
+
+3. **Configure as variáveis de ambiente** (opcional)
+   ```bash
+   # Crie um arquivo .env na raiz do projeto
+   VITE_SUPABASE_URL=sua_url_supabase
+   VITE_SUPABASE_ANON_KEY=sua_chave_anonima
+   ```
+
+4. **Configure o banco de dados** (se usar Supabase)
+   ```bash
+   # Execute o script SQL no Supabase SQL Editor
+   # Arquivo: database/setup.sql
+   ```
+
+### 🏃‍♂️ Executar em Desenvolvimento
+
 ```bash
+# Modo desenvolvimento
 npm run tauri dev
 ```
 
-### 4. Navegação Principal
+### 📦 Build para Produção
 
-#### **Dashboard** 
-- Visão geral dos dados financeiros
-- Cards de resumo com totais
-- Lista das transações mais recentes
+```bash
+# Build completo
+npm run tauri build
 
-#### **Entradas/Saídas**
-- Visualização filtrada por tipo
-- Total específico de cada categoria
-- Lista detalhada das transações
-
-#### **Gerenciar Transações**
-- CRUD completo de transações
-- Filtros por tipo
-- Modal de criação/edição
-- Confirmação para exclusões
-
-#### **Relatórios**
-- Gráficos interativos
-- Análise mensal comparativa
-- Distribuição por categorias
-- Evolução temporal do saldo
-
-## 🗃 Base de Dados (Supabase - Preparado)
-
-O sistema está preparado para integração com Supabase PostgreSQL:
-
-```sql
--- Enum para tipo de transação
-CREATE TYPE transaction_type AS ENUM ('entrada', 'saida');
-
--- Tabela de transações
-CREATE TABLE transactions (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    title TEXT NOT NULL,
-    description TEXT,
-    amount DECIMAL(10,2) NOT NULL,
-    type transaction_type NOT NULL,
-    category TEXT NOT NULL,
-    date DATE NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Tabela de categorias
-CREATE TABLE categories (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    name TEXT NOT NULL,
-    type transaction_type NOT NULL,
-    color TEXT NOT NULL,
-    icon TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+# Localização do executável
+# Windows: src-tauri/target/release/Luminare Eventos.exe
+# macOS: src-tauri/target/release/bundle/dmg/
+# Linux: src-tauri/target/release/bundle/appimage/
 ```
 
-## 📋 Arquivo COMO_EXECUTAR_SQL.md
+## 💾 Banco de Dados
 
-Foi criado um guia completo passo-a-passo para execução dos scripts SQL no Supabase.
+### 🗄️ Estrutura das Tabelas
 
-## 🎨 Cores e Identidade Visual
+#### **transactions**
+- `id` (UUID) - Identificador único
+- `title` (VARCHAR) - Título da transação
+- `description` (TEXT) - Descrição opcional
+- `amount` (DECIMAL) - Valor da transação
+- `type` (ENUM) - 'entrada' ou 'saida'
+- `category` (VARCHAR) - Categoria da transação
+- `date` (DATE) - Data da transação
+- `created_at` (TIMESTAMP) - Data de criação
 
-### Paleta Principal
-- **Primário**: `#212038` (Azul escuro profissional)
-- **Secundário**: `#FFFFFF` (Branco)
-- **Entradas**: `#10b981` (Verde)
-- **Saídas**: `#ef4444` (Vermelho)
-- **Lucro**: `#3b82f6` (Azul)
-- **Prejuízo**: `#f97316` (Laranja)
+#### **categories**
+- `id` (UUID) - Identificador único
+- `name` (VARCHAR) - Nome da categoria
+- `type` (ENUM) - 'entrada' ou 'saida'
+- `color` (VARCHAR) - Cor em hexadecimal
+- `icon` (VARCHAR) - Nome do ícone
+- `created_at` (TIMESTAMP) - Data de criação
 
-### Design System
-- **Shadows**: Sombras sutis para profundidade
-- **Rounded**: Bordas arredondadas modernas
-- **Transitions**: Animações suaves
-- **Responsive**: Layout adaptativo
+### 🔐 Configuração Supabase
 
-## 🔧 Próximos Passos Sugeridos
+1. Crie um projeto no [Supabase](https://supabase.com)
+2. Execute o script `database/setup.sql`
+3. Configure as variáveis de ambiente
+4. Teste a conexão em **Configurações → Testar Conexão**
 
-### Integrações Futuras
-1. **Supabase**: Conectar com banco de dados em nuvem
-2. **Autenticação**: Sistema de login e usuários
-3. **Backup**: Sincronização automática
-4. **Notificações**: Alertas de vencimentos
-5. **Relatórios PDF**: Exportação de documentos
-6. **Multi-empresa**: Suporte para múltiplos negócios
+## 🎨 Personalização
 
-### Melhorias de UX
-1. **Dark Mode**: Tema escuro
-2. **Configurações**: Personalização avançada
-3. **Atalhos de Teclado**: Navegação rápida
-4. **Drag & Drop**: Interface mais intuitiva
+### 🏷️ Categorias Padrão
 
-## 💡 Características Técnicas
+**Entradas (Receitas):**
+- 🎉 Mini-Festa
+- 🔧 Pegue e Monte  
+- 🎂 Kit Mêsversário
 
-- **TypeScript 100%**: Tipagem completa
-- **Performance**: Otimizada com React 19
-- **Responsive Design**: Mobile-first
-- **Acessibilidade**: Padrões WCAG
-- **Componentização**: Arquitetura modular
-- **Estado Global**: Context API eficiente
+**Saídas (Custos):**
+- 🏛️ Arco Redondo
+- 🏺 Arco Romano
+- 🍽️ Bandejas
+- 🎪 Capa Cilindro
 
-## 📝 Licença
+### 🎨 Temas e Cores
 
-Sistema desenvolvido exclusivamente para **Luminare Eventos**.
+```css
+/* Cores principais */
+--primary: #212038;     /* Azul escuro */
+--secondary: #3a3a5c;   /* Azul médio */
+--success: #10b981;     /* Verde entradas */
+--danger: #ef4444;      /* Vermelho saídas */
+```
+
+## 🔧 Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+npm run dev          # Frontend apenas
+npm run tauri dev    # Aplicação completa
+
+# Build
+npm run build        # Build frontend
+npm run tauri build  # Build aplicação desktop
+
+# Qualidade de código
+npm run lint         # ESLint
+npm run preview      # Preview do build
+```
+
+## 📊 Funcionalidades Detalhadas
+
+### 💰 Sistema de Transações
+
+#### **Adicionar Transação**
+1. Clique em "Nova Entrada" ou "Nova Saída"
+2. Preencha o formulário:
+   - **Título**: Nome da transação
+   - **Categoria**: Selecione da lista
+   - **Valor**: Valor em reais
+   - **Data**: Data da transação
+   - **Descrição**: Opcional
+3. Clique em "Salvar"
+
+#### **Gerenciar Transações**
+- **Visualizar**: Clique no ícone 👁️
+- **Editar**: Clique no ícone ✏️
+- **Excluir**: Clique no ícone 🗑️
+- **Filtrar**: Por tipo (Todas/Entradas/Saídas)
+
+### 📈 Relatórios
+
+#### **Dashboard Principal**
+- Gráfico de entradas vs saídas
+- Lucro/prejuízo do período
+- Distribuição por categoria
+- Tendências mensais
+
+#### **Análises Disponíveis**
+- Total de entradas por categoria
+- Total de saídas por categoria
+- Evolução temporal
+- Comparações percentuais
+
+## 🐛 Solução de Problemas
+
+### ❌ Problemas Comuns
+
+#### **Erro de Conexão com Banco**
+```bash
+# Verifique as variáveis de ambiente
+echo $VITE_SUPABASE_URL
+echo $VITE_SUPABASE_ANON_KEY
+
+# Teste a conexão em Configurações → Testar Conexão
+```
+
+#### **Erro de Build Tauri**
+```bash
+# Instale as dependências do Rust
+rustup update
+cargo clean
+
+# Rebuild
+npm run tauri build
+```
+
+#### **Problemas de Node.js**
+```bash
+# Atualize para versão compatível
+node -v  # Deve ser 22.12+
+
+# Use nvm se necessário
+nvm use 22.12.0
+```
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+## 👥 Autor
+
+**Gugalzg** - [GitHub](https://github.com/Gugalzg)
+
+## 🙏 Agradecimentos
+
+- [Tauri](https://tauri.app) - Framework desktop incrível
+- [React](https://reactjs.org) - Biblioteca JavaScript
+- [Supabase](https://supabase.com) - Backend as a Service
+- [TailwindCSS](https://tailwindcss.com) - Framework CSS
 
 ---
 
-**Desenvolvido com ❤️ para transformar a gestão financeira da Luminare Eventos**
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+<div align="center">
+  <p>💡 <strong>Luminare Eventos</strong> - Transformando a gestão financeira de eventos</p>
+  <p>⭐ Se este projeto foi útil, considere dar uma estrela!</p>
+</div>
