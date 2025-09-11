@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../contexts/AuthContext'
 import { expenseService } from '../services/expenseService'
 import type { Category, ExpenseFormData, Expense } from '../types'
 import { X, CalendarDays, DollarSign, FileText, Tag } from 'lucide-react'
@@ -18,7 +17,6 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
   onExpenseCreated,
   expense
 }) => {
-  const { user } = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<ExpenseFormData>({
@@ -30,7 +28,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
   })
 
   useEffect(() => {
-    if (isOpen && user) {
+    if (isOpen) {
       loadCategories()
       if (expense) {
         setFormData({
@@ -50,12 +48,11 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
         })
       }
     }
-  }, [isOpen, user, expense])
+  }, [isOpen, expense])
 
   const loadCategories = async () => {
-    if (!user) return
     try {
-      const data = await expenseService.getCategories(user.id)
+      const data = await expenseService.getCategories()
       setCategories(data)
     } catch (error) {
       console.error('Erro ao carregar categorias:', error)
@@ -64,14 +61,13 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
 
     setLoading(true)
     try {
       if (expense) {
-        await expenseService.updateExpense(expense.id, formData, user.id)
+        await expenseService.updateExpense(expense.id, formData)
       } else {
-        await expenseService.createExpense(formData, user.id)
+        await expenseService.createExpense(formData)
       }
       onExpenseCreated()
       onClose()

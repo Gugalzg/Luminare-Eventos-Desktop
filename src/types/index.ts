@@ -6,7 +6,6 @@ export interface Expense {
   category: string
   date: string
   created_at: string
-  user_id: string
 }
 
 export interface Category {
@@ -15,7 +14,6 @@ export interface Category {
   color: string
   icon: string
   created_at: string
-  user_id: string
 }
 
 export interface ExpenseWithCategory extends Expense {

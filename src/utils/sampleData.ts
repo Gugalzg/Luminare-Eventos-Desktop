@@ -9,7 +9,6 @@ export const SAMPLE_EXPENSES: Omit<Expense, 'id'>[] = [
     category: '1', // Alimentação
     date: new Date().toISOString().split('T')[0],
     created_at: new Date().toISOString(),
-    user_id: 'local'
   },
   {
     title: 'Posto Shell',
@@ -18,7 +17,6 @@ export const SAMPLE_EXPENSES: Omit<Expense, 'id'>[] = [
     category: '2', // Transporte
     date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // ontem
     created_at: new Date(Date.now() - 86400000).toISOString(),
-    user_id: 'local'
   },
   {
     title: 'Farmácia Droga Raia',
@@ -27,7 +25,6 @@ export const SAMPLE_EXPENSES: Omit<Expense, 'id'>[] = [
     category: '3', // Saúde
     date: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 dias atrás
     created_at: new Date(Date.now() - 172800000).toISOString(),
-    user_id: 'local'
   },
   {
     title: 'Cinema Cinemark',
@@ -36,7 +33,6 @@ export const SAMPLE_EXPENSES: Omit<Expense, 'id'>[] = [
     category: '5', // Lazer
     date: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 dias atrás
     created_at: new Date(Date.now() - 259200000).toISOString(),
-    user_id: 'local'
   },
   {
     title: 'Amazon',
@@ -45,7 +41,6 @@ export const SAMPLE_EXPENSES: Omit<Expense, 'id'>[] = [
     category: '4', // Educação
     date: new Date(Date.now() - 432000000).toISOString().split('T')[0], // 5 dias atrás
     created_at: new Date(Date.now() - 432000000).toISOString(),
-    user_id: 'local'
   }
 ];
 

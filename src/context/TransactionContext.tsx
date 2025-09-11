@@ -1,5 +1,6 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { transactionService, categoryService } from '../services/transactionService'
 
 // Tipos para o sistema financeiro
 export interface Transaction {
@@ -25,17 +26,20 @@ export interface Category {
 interface TransactionContextType {
   transactions: Transaction[]
   categories: Category[]
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'created_at'>) => void
-  updateTransaction: (id: string, transaction: Partial<Transaction>) => void
-  deleteTransaction: (id: string) => void
-  addCategory: (category: Omit<Category, 'id' | 'created_at'>) => void
-  updateCategory: (id: string, category: Partial<Category>) => void
-  deleteCategory: (id: string) => void
+  loading: boolean
+  error: string | null
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'created_at'>) => Promise<void>
+  updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>
+  deleteTransaction: (id: string) => Promise<void>
+  addCategory: (category: Omit<Category, 'id' | 'created_at'>) => Promise<void>
+  updateCategory: (id: string, category: Partial<Category>) => Promise<void>
+  deleteCategory: (id: string) => Promise<void>
   getTotalEntradas: () => number
   getTotalSaidas: () => number
   getLucro: () => number
   getEntradasByCategory: () => Record<string, number>
   getSaidasByCategory: () => Record<string, number>
+  refreshData: () => Promise<void>
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined)
@@ -82,38 +86,168 @@ const DEFAULT_CATEGORIES: Category[] = [
 export function TransactionProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>('luminare-transactions', [])
   const [categories, setCategories] = useLocalStorage<Category[]>('luminare-categories', DEFAULT_CATEGORIES)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const addTransaction = (transactionData: Omit<Transaction, 'id' | 'created_at'>) => {
-    const newTransaction: Transaction = {
-      ...transactionData,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString()
+  // Carregar dados do Supabase na inicialização
+  useEffect(() => {
+    loadInitialData()
+  }, [])
+
+  const loadInitialData = async () => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      // Carrega categorias e cria as padrão se necessário
+      await categoryService.ensureDefaultCategories()
+      const categoriesFromDB = await categoryService.getCategories()
+      
+      // Carrega transações
+      const transactionsFromDB = await transactionService.getTransactions()
+      
+      // Atualiza o estado local e localStorage
+      setCategories(categoriesFromDB)
+      setTransactions(transactionsFromDB)
+      
+      console.log('Dados carregados do Supabase:', {
+        transactions: transactionsFromDB.length,
+        categories: categoriesFromDB.length
+      })
+    } catch (err) {
+      console.error('Erro ao carregar dados:', err)
+      setError('Erro ao carregar dados do servidor')
+      
+      // Em caso de erro, usa dados do localStorage como fallback
+      console.log('Usando dados do localStorage como fallback')
+    } finally {
+      setLoading(false)
     }
-    setTransactions(prev => [...prev, newTransaction])
   }
 
-  const updateTransaction = (id: string, transactionData: Partial<Transaction>) => {
-    setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...transactionData } : t))
+  const refreshData = async () => {
+    await loadInitialData()
   }
 
-  const deleteTransaction = (id: string) => {
-    setTransactions(prev => prev.filter(t => t.id !== id))
-  }
-
-  const addCategory = (categoryData: Omit<Category, 'id' | 'created_at'>) => {
-    const newCategory: Category = {
-      ...categoryData,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString()
+  const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'created_at'>) => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      // Salva no Supabase primeiro
+      const newTransaction = await transactionService.createTransaction(transactionData)
+      
+      if (newTransaction) {
+        // Atualiza o estado local
+        setTransactions(prev => [newTransaction, ...prev])
+        console.log('Transação criada com sucesso:', newTransaction)
+      }
+    } catch (err) {
+      console.error('Erro ao criar transação:', err)
+      setError('Erro ao salvar transação')
+      
+      // Fallback: salva apenas localmente
+      const localTransaction: Transaction = {
+        ...transactionData,
+        id: Date.now().toString(),
+        created_at: new Date().toISOString()
+      }
+      setTransactions(prev => [localTransaction, ...prev])
+      
+      throw err // Re-throw para que o componente possa tratar
+    } finally {
+      setLoading(false)
     }
-    setCategories(prev => [...prev, newCategory])
   }
 
-  const updateCategory = (id: string, categoryData: Partial<Category>) => {
+  const updateTransaction = async (id: string, transactionData: Partial<Transaction>) => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      // Atualiza no Supabase primeiro
+      const updatedTransaction = await transactionService.updateTransaction(id, transactionData)
+      
+      if (updatedTransaction) {
+        // Atualiza o estado local
+        setTransactions(prev => prev.map(t => t.id === id ? updatedTransaction : t))
+        console.log('Transação atualizada com sucesso:', updatedTransaction)
+      }
+    } catch (err) {
+      console.error('Erro ao atualizar transação:', err)
+      setError('Erro ao atualizar transação')
+      
+      // Fallback: atualiza apenas localmente
+      setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...transactionData } : t))
+      
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const deleteTransaction = async (id: string) => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      // Remove do Supabase primeiro
+      await transactionService.deleteTransaction(id)
+      
+      // Remove do estado local
+      setTransactions(prev => prev.filter(t => t.id !== id))
+      console.log('Transação removida com sucesso:', id)
+    } catch (err) {
+      console.error('Erro ao remover transação:', err)
+      setError('Erro ao remover transação')
+      
+      // Fallback: remove apenas localmente
+      setTransactions(prev => prev.filter(t => t.id !== id))
+      
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const addCategory = async (categoryData: Omit<Category, 'id' | 'created_at'>) => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      // Salva no Supabase primeiro
+      const newCategory = await categoryService.createCategory(categoryData)
+      
+      if (newCategory) {
+        // Atualiza o estado local
+        setCategories(prev => [...prev, newCategory])
+        console.log('Categoria criada com sucesso:', newCategory)
+      }
+    } catch (err) {
+      console.error('Erro ao criar categoria:', err)
+      setError('Erro ao salvar categoria')
+      
+      // Fallback: salva apenas localmente
+      const localCategory: Category = {
+        ...categoryData,
+        id: Date.now().toString(),
+        created_at: new Date().toISOString()
+      }
+      setCategories(prev => [...prev, localCategory])
+      
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateCategory = async (id: string, categoryData: Partial<Category>) => {
+    // Implementação similar para categorias (não implementada no serviço ainda)
     setCategories(prev => prev.map(c => c.id === id ? { ...c, ...categoryData } : c))
   }
 
-  const deleteCategory = (id: string) => {
+  const deleteCategory = async (id: string) => {
+    // Implementação similar para categorias (não implementada no serviço ainda)
     setCategories(prev => prev.filter(c => c.id !== id))
   }
 
@@ -152,6 +286,8 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
   const value: TransactionContextType = {
     transactions,
     categories,
+    loading,
+    error,
     addTransaction,
     updateTransaction,
     deleteTransaction,
@@ -162,7 +298,8 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
     getTotalSaidas,
     getLucro,
     getEntradasByCategory,
-    getSaidasByCategory
+    getSaidasByCategory,
+    refreshData
   }
 
   return (

@@ -194,13 +194,35 @@ export const SupabaseConnectionTest = () => {
         <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#374151' }}>
           Como configurar:
         </h4>
-        <ol style={{ fontSize: '13px', color: '#64748b', paddingLeft: '16px', margin: 0 }}>
+        <ol style={{ fontSize: '13px', color: '#64748b', paddingLeft: '16px', margin: '0 0 12px 0' }}>
           <li>Acesse seu projeto no Supabase Dashboard</li>
           <li>Vá em Settings → API</li>
           <li>Copie a URL do projeto e a chave anon/public</li>
-          <li>Substitua os valores em <code>src/lib/supabase.ts</code></li>
-          <li>Crie as tabelas 'expenses' e 'categories' no SQL Editor</li>
+          <li>Crie um arquivo <code>.env</code> na raiz do projeto com:</li>
+          <div style={{ 
+            backgroundColor: '#e2e8f0', 
+            padding: '8px', 
+            borderRadius: '4px', 
+            fontFamily: 'monospace',
+            fontSize: '12px',
+            margin: '4px 0'
+          }}>
+            VITE_SUPABASE_URL=sua_url_aqui<br/>
+            VITE_SUPABASE_ANON_KEY=sua_chave_aqui
+          </div>
+          <li>Execute o script SQL do arquivo <code>database/setup.sql</code> no SQL Editor do Supabase</li>
+          <li>Reinicie o servidor de desenvolvimento</li>
         </ol>
+        
+        <h5 style={{ margin: '8px 0 4px 0', fontSize: '13px', color: '#374151' }}>
+          Erros Comuns:
+        </h5>
+        <ul style={{ fontSize: '12px', color: '#64748b', paddingLeft: '16px', margin: 0 }}>
+          <li><strong>information_schema.tables:</strong> Tabelas do sistema não criadas - execute o script SQL</li>
+          <li><strong>relation does not exist:</strong> Tabelas não encontradas - verifique o script SQL</li>
+          <li><strong>Invalid API key:</strong> Chave incorreta - verifique as variáveis de ambiente</li>
+          <li><strong>Network error:</strong> URL incorreta ou problemas de conexão</li>
+        </ul>
       </div>
 
       <style>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MdAdd, MdEdit, MdDelete, MdVisibility } from 'react-icons/md';
+import { MdEdit, MdDelete, MdVisibility } from 'react-icons/md';
 import { useTransactions } from '../../context/TransactionContext';
 import TransactionForm from './TransactionForm';
 import type { TransactionFormData } from './TransactionForm';
@@ -34,12 +34,6 @@ const TransactionList: React.FC = () => {
     if (filter === 'all') return true;
     return transaction.type === filter;
   });
-
-  // Handlers
-  const handleCreate = () => {
-    setSelectedTransaction(null);
-    setModalMode('create');
-  };
 
   const handleEdit = (transaction: Transaction) => {
     setSelectedTransaction(transaction);

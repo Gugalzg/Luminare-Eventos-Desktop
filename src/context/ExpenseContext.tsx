@@ -27,64 +27,56 @@ const DEFAULT_CATEGORIES: Category[] = [
     name: 'Alimentação', 
     color: '#ef4444', 
     icon: 'utensils',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   },
   { 
     id: '2', 
     name: 'Transporte', 
     color: '#3b82f6', 
     icon: 'car',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   },
   { 
     id: '3', 
     name: 'Saúde', 
     color: '#10b981', 
     icon: 'heart',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   },
   { 
     id: '4', 
     name: 'Educação', 
     color: '#8b5cf6', 
     icon: 'book',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   },
   { 
     id: '5', 
     name: 'Lazer', 
     color: '#f59e0b', 
     icon: 'gamepad-2',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   },
   { 
     id: '6', 
     name: 'Casa', 
     color: '#06b6d4', 
     icon: 'home',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   },
   { 
     id: '7', 
     name: 'Roupas', 
     color: '#ec4899', 
     icon: 'shirt',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   },
   { 
     id: '8', 
     name: 'Outros', 
     color: '#6b7280', 
     icon: 'more-horizontal',
-    created_at: new Date().toISOString(),
-    user_id: 'local'
+    created_at: new Date().toISOString()
   }
 ];
 

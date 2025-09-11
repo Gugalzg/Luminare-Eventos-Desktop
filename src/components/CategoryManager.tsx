@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../contexts/AuthContext'
 import { expenseService } from '../services/expenseService'
 import type { Category } from '../types'
 import { X, Plus, Edit2, Trash2 } from 'lucide-react'
@@ -21,7 +20,6 @@ const defaultCategories = [
 ]
 
 export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClose, onCategoryCreated }) => {
-  const { user } = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [isCreating, setIsCreating] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
@@ -29,15 +27,14 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (isOpen && user) {
+    if (isOpen) {
       loadCategories()
     }
-  }, [isOpen, user])
+  }, [isOpen])
 
   const loadCategories = async () => {
-    if (!user) return
     try {
-      const data = await expenseService.getCategories(user.id)
+      const data = await expenseService.getCategories()
       setCategories(data)
     } catch (error) {
       console.error('Erro ao carregar categorias:', error)
@@ -45,11 +42,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
   }
 
   const handleCreateDefaultCategories = async () => {
-    if (!user) return
     setLoading(true)
     try {
       for (const category of defaultCategories) {
-        await expenseService.createCategory(category, user.id)
+        await expenseService.createCategory(category)
       }
       await loadCategories()
       onCategoryCreated?.()
@@ -62,14 +58,13 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
 
     setLoading(true)
     try {
       if (editingCategory) {
-        await expenseService.updateCategory(editingCategory.id, formData, user.id)
+        await expenseService.updateCategory(editingCategory.id, formData)
       } else {
-        await expenseService.createCategory(formData, user.id)
+        await expenseService.createCategory(formData)
       }
       await loadCategories()
       onCategoryCreated?.()
@@ -94,10 +89,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
   }
 
   const handleDelete = async (id: string) => {
-    if (!user || !confirm('Tem certeza que deseja excluir esta categoria?')) return
+    if (!confirm('Tem certeza que deseja excluir esta categoria?')) return
 
     try {
-      await expenseService.deleteCategory(id, user.id)
+      await expenseService.deleteCategory(id)
       await loadCategories()
       onCategoryCreated?.()
     } catch (error) {

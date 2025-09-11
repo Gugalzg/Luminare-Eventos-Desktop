@@ -12,7 +12,7 @@ const isSupabaseConfigured = () => {
 // Main expense service that switches between real and mock data
 export const expenseService = {
   // Expenses CRUD
-  async getExpenses(userId: string): Promise<Expense[]> {
+  async getExpenses(): Promise<Expense[]> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.getExpenses()
     }
@@ -20,21 +20,20 @@ export const expenseService = {
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
-      .eq('user_id', userId)
       .order('date', { ascending: false })
 
     if (error) throw error
     return data || []
   },
 
-  async createExpense(expense: ExpenseFormData, userId: string): Promise<Expense> {
+  async createExpense(expense: ExpenseFormData): Promise<Expense> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.createExpense(expense)
     }
 
     const { data, error } = await supabase
       .from('expenses')
-      .insert({ ...expense, user_id: userId })
+      .insert(expense)
       .select()
       .single()
 
@@ -42,7 +41,7 @@ export const expenseService = {
     return data
   },
 
-  async updateExpense(id: string, expense: Partial<ExpenseFormData>, userId: string): Promise<Expense> {
+  async updateExpense(id: string, expense: Partial<ExpenseFormData>): Promise<Expense> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.updateExpense(id, expense)
     }
@@ -51,7 +50,6 @@ export const expenseService = {
       .from('expenses')
       .update(expense)
       .eq('id', id)
-      .eq('user_id', userId)
       .select()
       .single()
 
@@ -59,7 +57,7 @@ export const expenseService = {
     return data
   },
 
-  async deleteExpense(id: string, userId: string): Promise<void> {
+  async deleteExpense(id: string): Promise<void> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.deleteExpense(id)
     }
@@ -68,13 +66,12 @@ export const expenseService = {
       .from('expenses')
       .delete()
       .eq('id', id)
-      .eq('user_id', userId)
 
     if (error) throw error
   },
 
   // Categories CRUD
-  async getCategories(userId: string): Promise<Category[]> {
+  async getCategories(): Promise<Category[]> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.getCategories()
     }
@@ -82,21 +79,20 @@ export const expenseService = {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
-      .eq('user_id', userId)
       .order('name')
 
     if (error) throw error
     return data || []
   },
 
-  async createCategory(category: CategoryFormData, userId: string): Promise<Category> {
+  async createCategory(category: CategoryFormData): Promise<Category> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.createCategory(category)
     }
 
     const { data, error } = await supabase
       .from('categories')
-      .insert({ ...category, user_id: userId })
+      .insert(category)
       .select()
       .single()
 
@@ -104,7 +100,7 @@ export const expenseService = {
     return data
   },
 
-  async updateCategory(id: string, category: Partial<CategoryFormData>, userId: string): Promise<Category> {
+  async updateCategory(id: string, category: Partial<CategoryFormData>): Promise<Category> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.updateCategory(id, category)
     }
@@ -113,7 +109,6 @@ export const expenseService = {
       .from('categories')
       .update(category)
       .eq('id', id)
-      .eq('user_id', userId)
       .select()
       .single()
 
@@ -121,7 +116,7 @@ export const expenseService = {
     return data
   },
 
-  async deleteCategory(id: string, userId: string): Promise<void> {
+  async deleteCategory(id: string): Promise<void> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.deleteCategory(id)
     }
@@ -130,13 +125,12 @@ export const expenseService = {
       .from('categories')
       .delete()
       .eq('id', id)
-      .eq('user_id', userId)
 
     if (error) throw error
   },
 
   // Analytics
-  async getExpensesByDateRange(userId: string, startDate: string, endDate: string): Promise<Expense[]> {
+  async getExpensesByDateRange(startDate: string, endDate: string): Promise<Expense[]> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.getExpensesByDateRange()
     }
@@ -144,7 +138,6 @@ export const expenseService = {
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
-      .eq('user_id', userId)
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: false })
@@ -153,7 +146,7 @@ export const expenseService = {
     return data || []
   },
 
-  async getTotalByCategory(userId: string, startDate?: string, endDate?: string): Promise<{ category: string; total: number }[]> {
+  async getTotalByCategory(startDate?: string, endDate?: string): Promise<{ category: string; total: number }[]> {
     if (!isSupabaseConfigured()) {
       return mockExpenseService.getTotalByCategory()
     }
@@ -161,7 +154,6 @@ export const expenseService = {
     let query = supabase
       .from('expenses')
       .select('category, amount')
-      .eq('user_id', userId)
 
     if (startDate) query = query.gte('date', startDate)
     if (endDate) query = query.lte('date', endDate)

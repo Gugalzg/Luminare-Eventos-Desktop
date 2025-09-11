@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../contexts/AuthContext'
 import { expenseService } from '../services/expenseService'
 import type { Expense, Category } from '../types'
 import { Edit2, Trash2, Calendar, DollarSign } from 'lucide-react'
@@ -12,7 +11,6 @@ interface ExpenseListProps {
 }
 
 export const ExpenseList: React.FC<ExpenseListProps> = ({ onEditExpense, refreshTrigger }) => {
-  const { user } = useAuth()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,18 +20,15 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ onEditExpense, refresh
   })
 
   useEffect(() => {
-    if (user) {
-      loadData()
-    }
-  }, [user, refreshTrigger, filter])
+    loadData()
+  }, [refreshTrigger, filter])
 
   const loadData = async () => {
-    if (!user) return
     setLoading(true)
     try {
       const [expensesData, categoriesData] = await Promise.all([
-        expenseService.getExpenses(user.id),
-        expenseService.getCategories(user.id)
+        expenseService.getExpenses(),
+        expenseService.getCategories()
       ])
       setExpenses(expensesData)
       setCategories(categoriesData)
@@ -45,10 +40,10 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ onEditExpense, refresh
   }
 
   const handleDelete = async (id: string) => {
-    if (!user || !confirm('Tem certeza que deseja excluir este gasto?')) return
+    if (!confirm('Tem certeza que deseja excluir este gasto?')) return
 
     try {
-      await expenseService.deleteExpense(id, user.id)
+      await expenseService.deleteExpense(id)
       setExpenses(expenses.filter(expense => expense.id !== id))
     } catch (error) {
       console.error('Erro ao excluir gasto:', error)

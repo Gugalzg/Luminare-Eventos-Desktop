@@ -21,21 +21,27 @@ export const testConnection = async () => {
       }
     }
 
-    // Testa a conexão usando uma função do sistema que sempre existe
+    // Testa a conexão tentando fazer uma query simples em uma das nossas tabelas
     const { error } = await supabase
-      .from('information_schema.tables')
-      .select('table_name')
+      .from('transactions')
+      .select('id')
       .limit(1)
     
     if (error) {
-      // Se der erro de autenticação ou conexão
+      // Se der erro na tabela transactions, verifica se é problema de tabela não existir
+      if (error.message.includes('relation "public.transactions" does not exist')) {
+        return { 
+          success: false, 
+          error: 'Tabelas não encontradas. Execute o script SQL de configuração primeiro.' 
+        }
+      }
       return { success: false, error: error.message }
     }
     
     return { 
       success: true, 
       message: 'Conexão com Supabase estabelecida com sucesso!',
-      info: 'Autenticação e conectividade verificadas'
+      info: 'Autenticação, conectividade e tabelas verificadas'
     }
   } catch (err: any) {
     console.log('Erro de conexão:', err)
@@ -85,7 +91,6 @@ export type Database = {
           category: string
           date: string
           created_at: string
-          user_id: string
         }
         Insert: {
           id?: string
@@ -96,7 +101,6 @@ export type Database = {
           category: string
           date: string
           created_at?: string
-          user_id: string
         }
         Update: {
           id?: string
@@ -107,7 +111,6 @@ export type Database = {
           category?: string
           date?: string
           created_at?: string
-          user_id?: string
         }
       }
       categories: {
@@ -118,7 +121,6 @@ export type Database = {
           color: string
           icon: string
           created_at: string
-          user_id: string
         }
         Insert: {
           id?: string
@@ -127,7 +129,6 @@ export type Database = {
           color: string
           icon: string
           created_at?: string
-          user_id: string
         }
         Update: {
           id?: string
@@ -136,7 +137,6 @@ export type Database = {
           color?: string
           icon?: string
           created_at?: string
-          user_id?: string
         }
       }
     }

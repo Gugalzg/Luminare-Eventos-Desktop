@@ -34,8 +34,8 @@ export function SidebarNavigation({ currentView, onViewChange }: SidebarNavigati
     <div style={{ display: 'flex', height: '100vh', position: 'relative' }}>
       <Sidebar
         collapsed={collapsed}
-        width="280px"
-        collapsedWidth="70px"
+        width="250px"
+        collapsedWidth="60px"
         backgroundColor={colors.primary}
         rootStyles={{
           border: 'none',

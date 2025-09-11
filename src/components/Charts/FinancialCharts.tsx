@@ -20,6 +20,7 @@ import {
 import { format, startOfMonth, endOfMonth, subMonths, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon } from 'lucide-react'
+import './FinancialCharts.css'
 
 // Custom hooks for advanced animations
 const useTilt = () => {
@@ -104,156 +105,23 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({ children, gradient, classNa
   }, [delay])
 
   return (
-    <>
-      <style>{`
-        .enhanced-card {
-          position: relative;
-          overflow: hidden;
-          transform-style: preserve-3d;
-          min-height: 280px;
-          width: 100%;
-          border-radius: 24px;
-        }
-        
-        .enhanced-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.4),
-            transparent
-          );
-          transition: left 0.6s ease;
-          z-index: 1;
-          border-radius: 24px;
-        }
-        
-        .enhanced-card:hover::before {
-          left: 100%;
-        }
-        
-        .enhanced-card::after {
-          content: '';
-          position: absolute;
-          top: -2px;
-          left: -2px;
-          right: -2px;
-          bottom: -2px;
-          background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
-          background-size: 300% 300%;
-          border-radius: 26px;
-          z-index: -1;
-          filter: blur(8px);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          animation: gradient-shift 3s ease infinite;
-        }
-        
-        .enhanced-card:hover::after {
-          opacity: 0.7;
-        }
-        
-        .card-wrapper {
-          padding: 20px;
-          margin: 10px;
-        }
-        
-        @keyframes gradient-shift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-5px); }
-        }
-        
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
-          50% { box-shadow: 0 0 40px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.1); }
-        }
-        
-        .icon-container {
-          animation: float 3s ease-in-out infinite;
-          border-radius: 16px;
-        }
-        
-        .enhanced-card:hover .icon-container {
-          animation: float 1.5s ease-in-out infinite;
-        }
-        
-        .card-content {
-          transform: translateZ(30px);
-        }
-        
-        .number-display {
-          background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: pulse-glow 2s ease-in-out infinite;
-          font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-        }
-        
-        .card-title {
-          font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-          font-weight: 600;
-          letter-spacing: 0.05em;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .card-subtitle {
-          font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-          font-weight: 300;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .period-label {
-          font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-          font-weight: 500;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .fade-in-up {
-          animation: fadeInUp 0.8s ease forwards;
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        
-        @keyframes fadeInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-      
-      <div 
-        ref={cardRef}
-        className={`enhanced-card rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 ${isVisible ? 'fade-in-up' : ''} ${className}`}
-        style={{
-          background: gradient,
-          backdropFilter: 'blur(15px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          ...tiltStyle
-        }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="card-content relative p-6 text-white">
-          {children}
-        </div>
+    <div 
+      ref={cardRef}
+      className={`enhanced-card rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 ${isVisible ? 'fade-in-up' : ''} ${className}`}
+      style={{
+        background: gradient,
+        backdropFilter: 'blur(15px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        ...tiltStyle
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
+      <div className="card-content relative p-6 text-white">
+        {children}
       </div>
-    </>
+    </div>
   )
 }
 
@@ -388,14 +256,15 @@ const FinancialCharts: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Cards de Resumo - Layout em Grid 2x2 Separados */}
+      {/* Cards de Resumo - Layout Horizontal */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '30px',
-        maxWidth: '800px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '8px',
+        justifyContent: 'center',
         margin: '0 auto',
-        padding: '20px'
+        padding: '10px',
+        maxWidth: '1200px'
       }}>
         {/* Entradas */}
         <div className="card-wrapper">
@@ -404,23 +273,23 @@ const FinancialCharts: React.FC = () => {
             delay={100}
             className=""
           >
-            <div className="flex flex-col h-full relative">
-              <div className="flex items-center justify-between mb-3">
-                <div className="icon-container p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+            <div className="card-content-wrapper">
+              <div className="card-header">
+                <div className="icon-container">
                   <TrendingUp className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-right">
-                  <div className="period-label text-white/70 text-xs font-medium uppercase tracking-wider">
+                  <div className="period-label">
                     Este Mês
                   </div>
                 </div>
               </div>
-              <div className="flex-1 flex flex-col justify-center items-center text-center">
-                <h3 className="card-title text-white/90 text-sm font-medium mb-4 flex items-center justify-center gap-1 w-full">
+              <div className="card-main-content">
+                <h3 className="card-title">
                   <span className="text-lg">💰</span> ENTRADAS
                 </h3>
-                <div className="w-full flex justify-center mb-3">
-                  <p className="text-2xl font-bold text-white leading-tight">
+                <div className="card-value-container">
+                  <p className="number-display">
                     <AnimatedNumber 
                       value={stats.entradas} 
                       formatter={formatCurrency}
@@ -428,7 +297,7 @@ const FinancialCharts: React.FC = () => {
                     />
                   </p>
                 </div>
-                <p className="card-subtitle text-white/60 text-xs font-light text-center w-full">
+                <p className="card-subtitle">
                   Receitas do período
                 </p>
               </div>
@@ -443,23 +312,23 @@ const FinancialCharts: React.FC = () => {
             delay={200}
             className=""
           >
-            <div className="flex flex-col h-full relative">
-              <div className="flex items-center justify-between mb-3">
-                <div className="icon-container p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+            <div className="card-content-wrapper">
+              <div className="card-header">
+                <div className="icon-container">
                   <TrendingDown className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-right">
-                  <div className="period-label text-white/70 text-xs font-medium uppercase tracking-wider">
+                  <div className="period-label">
                     Este Mês
                   </div>
                 </div>
               </div>
-              <div className="flex-1 flex flex-col justify-center items-center text-center">
-                <h3 className="card-title text-white/90 text-sm font-medium mb-4 flex items-center justify-center gap-1 w-full">
+              <div className="card-main-content">
+                <h3 className="card-title">
                   <span className="text-lg">💸</span> SAÍDAS
                 </h3>
-                <div className="w-full flex justify-center mb-3">
-                  <p className="text-2xl font-bold text-white leading-tight">
+                <div className="card-value-container">
+                  <p className="number-display">
                     <AnimatedNumber 
                       value={stats.saidas} 
                       formatter={formatCurrency}
@@ -467,7 +336,7 @@ const FinancialCharts: React.FC = () => {
                     />
                   </p>
                 </div>
-                <p className="card-subtitle text-white/60 text-xs font-light text-center w-full">
+                <p className="card-subtitle">
                   Despesas do período
                 </p>
               </div>
@@ -486,23 +355,23 @@ const FinancialCharts: React.FC = () => {
             delay={300}
             className=""
           >
-            <div className="flex flex-col h-full relative">
-              <div className="flex items-center justify-between mb-3">
-                <div className="icon-container p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+            <div className="card-content-wrapper">
+              <div className="card-header">
+                <div className="icon-container">
                   <DollarSign className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-right">
-                  <div className="period-label text-white/70 text-xs font-medium uppercase tracking-wider">
+                  <div className="period-label">
                     Este Mês
                   </div>
                 </div>
               </div>
-              <div className="flex-1 flex flex-col justify-center items-center text-center">
-                <h3 className="card-title text-white/90 text-sm font-medium mb-4 flex items-center justify-center gap-1 w-full">
+              <div className="card-main-content">
+                <h3 className="card-title">
                   <span className="text-lg">{stats.saldo >= 0 ? '📈' : '📉'}</span> SALDO
                 </h3>
-                <div className="w-full flex justify-center mb-3">
-                  <p className="text-2xl font-bold text-white leading-tight">
+                <div className="card-value-container">
+                  <p className="number-display">
                     {stats.saldo >= 0 ? '+' : '-'}
                     <AnimatedNumber 
                       value={Math.abs(stats.saldo)} 
@@ -511,7 +380,7 @@ const FinancialCharts: React.FC = () => {
                     />
                   </p>
                 </div>
-                <p className="card-subtitle text-white/60 text-xs font-light text-center w-full">
+                <p className="card-subtitle">
                   {stats.saldo >= 0 ? 'Resultado positivo' : 'Resultado negativo'}
                 </p>
               </div>
@@ -526,23 +395,23 @@ const FinancialCharts: React.FC = () => {
             delay={400}
             className=""
           >
-            <div className="flex flex-col h-full relative">
-              <div className="flex items-center justify-between mb-3">
-                <div className="icon-container p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+            <div className="card-content-wrapper">
+              <div className="card-header">
+                <div className="icon-container">
                   <PieChartIcon className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-right">
-                  <div className="period-label text-white/70 text-xs font-medium uppercase tracking-wider">
+                  <div className="period-label">
                     Este Mês
                   </div>
                 </div>
               </div>
-              <div className="flex-1 flex flex-col justify-center items-center text-center">
-                <h3 className="card-title text-white/90 text-sm font-medium mb-4 flex items-center justify-center gap-1 w-full">
+              <div className="card-main-content">
+                <h3 className="card-title">
                   <span className="text-lg">📊</span> TRANSAÇÕES
                 </h3>
-                <div className="w-full flex justify-center mb-3">
-                  <p className="text-2xl font-bold text-white leading-tight">
+                <div className="card-value-container">
+                  <p className="number-display">
                     <AnimatedNumber 
                       value={stats.totalTransactions} 
                       formatter={(v) => v.toString()}
@@ -550,7 +419,7 @@ const FinancialCharts: React.FC = () => {
                     />
                   </p>
                 </div>
-                <p className="card-subtitle text-white/60 text-xs font-light text-center w-full">
+                <p className="card-subtitle">
                   Operações realizadas
                 </p>
               </div>

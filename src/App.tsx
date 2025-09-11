@@ -6,6 +6,8 @@ import TransactionForm from './components/Forms/TransactionForm'
 import TransactionList from './components/Forms/TransactionList'
 import FinancialCharts from './components/Charts/FinancialCharts'
 import Modal from './components/UI/Modal'
+import { SupabaseConnectionTest } from './components/SupabaseConnectionTest'
+import SidebarLogo from './components/Sidebar/SidebarLogo'
 import type { TransactionFormData } from './components/Forms/TransactionForm'
 import './App.css'
 
@@ -42,22 +44,8 @@ function App() {
             color: '#FFFFFF'
           }}
         >
-          {/* Header do Sidebar */}
-          <div style={{ 
-            padding: '20px',
-            textAlign: 'center',
-            borderBottom: '1px solid #3a3a5c',
-            backgroundColor: '#212038'
-          }}>
-            <h2 style={{ 
-              color: '#FFFFFF',
-              margin: 0,
-              fontSize: sidebarCollapsed ? '14px' : '18px',
-              fontWeight: 'bold'
-            }}>
-              {sidebarCollapsed ? 'LE' : 'Luminare Eventos'}
-            </h2>
-          </div>
+          {/* Header do Sidebar com Logo */}
+          <SidebarLogo collapsed={sidebarCollapsed} />
           
           {/* Menu Items */}
           <Menu
@@ -216,15 +204,15 @@ function FilteredTransactions() {
     setTransactionType(null)
   }
 
-  const handleSubmit = (data: TransactionFormData) => {
+  const handleSubmit = async (data: TransactionFormData) => {
     try {
       if (editingTransaction) {
         // Editando transação existente
-        updateTransaction(editingTransaction.id, data)
+        await updateTransaction(editingTransaction.id, data)
         console.log('Transação atualizada:', data)
       } else {
         // Criando nova transação
-        addTransaction({
+        await addTransaction({
           title: data.title,
           description: data.description,
           amount: data.amount,
@@ -237,6 +225,7 @@ function FilteredTransactions() {
       handleCloseForm()
     } catch (error) {
       console.error('Erro ao salvar transação:', error)
+      // A mensagem de erro já é tratada no contexto
     }
   }
 
@@ -428,19 +417,25 @@ function FilteredTransactions() {
 
 function Settings() {
   return (
-    <div style={{
-      backgroundColor: '#FFFFFF',
-      padding: '20px',
-      borderRadius: '8px',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-    }}>
-      <h3 style={{ color: '#333', marginBottom: '15px' }}>Configurações do Sistema</h3>
-      <div style={{ color: '#666' }}>
-        <p>• Tema da aplicação</p>
-        <p>• Configurações de backup</p>
-        <p>• Preferências de relatório</p>
-        <p>• Configurações de notificação</p>
+    <div>
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        marginBottom: '20px'
+      }}>
+        <h3 style={{ color: '#333', marginBottom: '15px' }}>Configurações do Sistema</h3>
+        <div style={{ color: '#666' }}>
+          <p>• Tema da aplicação</p>
+          <p>• Configurações de backup</p>
+          <p>• Preferências de relatório</p>
+          <p>• Configurações de notificação</p>
+        </div>
       </div>
+      
+      {/* Componente de Teste de Conexão com Banco de Dados */}
+      <SupabaseConnectionTest />
     </div>
   )
 }
