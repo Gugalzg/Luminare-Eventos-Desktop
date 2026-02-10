@@ -1,14 +1,27 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 // Configurações do Supabase usando variáveis de ambiente
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'YOUR_SUPABASE_URL'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
-// Debug das variáveis (remover em produção)
-console.log('Supabase URL:', supabaseUrl)
-console.log('Supabase Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'undefined')
+// Cria o cliente Supabase apenas se as variáveis estiverem configuradas
+let supabase: SupabaseClient
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+try {
+  if (supabaseUrl && supabaseAnonKey) {
+    supabase = createClient(supabaseUrl, supabaseAnonKey)
+    console.log('Supabase conectado:', supabaseUrl)
+  } else {
+    console.warn('Supabase não configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env')
+    // Cria um client dummy com URL placeholder válida para evitar crash
+    supabase = createClient('https://placeholder.supabase.co', 'placeholder-key')
+  }
+} catch (error) {
+  console.warn('Erro ao inicializar Supabase:', error)
+  supabase = createClient('https://placeholder.supabase.co', 'placeholder-key')
+}
+
+export { supabase }
 
 // Função para testar a conexão com o Supabase
 export const testConnection = async () => {
@@ -51,8 +64,9 @@ export const testConnection = async () => {
 
 // Função para verificar se o Supabase está configurado
 export const isSupabaseConfigured = () => {
-  return supabaseUrl !== 'YOUR_SUPABASE_URL' && 
-         supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY'
+  return supabaseUrl !== '' && 
+         supabaseAnonKey !== '' &&
+         !supabaseUrl.includes('placeholder')
 }
 
 // Função para testar a estrutura das tabelas
