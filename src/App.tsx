@@ -6,15 +6,15 @@ import TransactionForm from './components/Forms/TransactionForm'
 import TransactionList from './components/Forms/TransactionList'
 import FinancialCharts from './components/Charts/FinancialCharts'
 import Modal from './components/UI/Modal'
-import { SupabaseConnectionTest } from './components/SupabaseConnectionTest'
 import SidebarLogo from './components/Sidebar/SidebarLogo'
+import SettingsPage from './components/Settings/SettingsPage'
 import type { TransactionFormData } from './components/Forms/TransactionForm'
 import './App.css'
 
 type Page = 'dashboard' | 'transactions' | 'charts' | 'settings'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('dashboard')
+  const [currentPage, setCurrentPage] = useState<Page>('transactions')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const renderPage = () => {
@@ -230,170 +230,114 @@ function FilteredTransactions() {
   }
 
   return (
-    <div className="transactions-page">
-      {/* Seção de Controle de Entradas e Saídas */}
-      <div style={{ 
-        marginBottom: '30px',
-        padding: '20px',
-        backgroundColor: '#FFFFFF',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    <div className="transactions-page" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Seção de Ações Rápidas */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '16px',
       }}>
-        <h3 style={{ 
-          color: '#333', 
-          marginBottom: '20px',
-          fontSize: '18px',
-          fontWeight: 'bold'
-        }}>
-          Controle de Entradas e Saídas
-        </h3>
-        
-        {/* Container de Botões com Layout Responsivo */}
-        <div style={{ 
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '16px',
-          justifyContent: 'center',
-          alignItems: 'stretch'
-        }}>
-          {/* Botão Adicionar Entrada */}
-          <button
-            onClick={handleAddEntrada}
-            style={{
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '20px',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-              transition: 'all 0.3s ease',
-              minWidth: '220px',
-              flex: '1 1 300px',
-              maxWidth: '400px'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.35)'
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.25)'
-            }}
-          >
-            <MdTrendingUp size={28} />
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: '18px', marginBottom: '4px' }}>Nova Entrada</div>
-              <div style={{ fontSize: '13px', opacity: 0.9, fontWeight: '400' }}>Receitas e ganhos</div>
-            </div>
-          </button>
-
-          {/* Botão Adicionar Saída */}
-          <button
-            onClick={handleAddSaida}
-            style={{
-              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '20px',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)',
-              transition: 'all 0.3s ease',
-              minWidth: '220px',
-              flex: '1 1 300px',
-              maxWidth: '400px'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.35)'
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.25)'
-            }}
-          >
-            <MdTrendingDown size={28} />
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: '18px', marginBottom: '4px' }}>Nova Saída</div>
-              <div style={{ fontSize: '13px', opacity: 0.9, fontWeight: '400' }}>Custos e despesas</div>
-            </div>
-          </button>
-        </div>
-
-        {/* Informações das Categorias */}
-        <div style={{ 
-          marginTop: '24px',
-          padding: '20px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          borderLeft: '4px solid #212038'
-        }}>
-          <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px',
-            fontSize: '14px',
-            color: '#666'
+        {/* Botão Nova Entrada */}
+        <button
+          onClick={handleAddEntrada}
+          style={{
+            position: 'relative',
+            background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
+            border: '1px solid rgba(16,185,129,0.2)',
+            borderRadius: '16px',
+            padding: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            transition: 'all 0.3s ease',
+            overflow: 'hidden',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px)'
+            e.currentTarget.style.boxShadow = '0 12px 32px rgba(16,185,129,0.2)'
+            e.currentTarget.style.borderColor = 'rgba(16,185,129,0.4)'
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = 'none'
+            e.currentTarget.style.borderColor = 'rgba(16,185,129,0.2)'
+          }}
+        >
+          <div style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
           }}>
-            <div>
-              <h5 style={{ 
-                color: '#059669', 
-                margin: '0 0 12px 0', 
-                fontSize: '15px', 
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <MdTrendingUp size={18} />
-                Categorias de Entrada:
-              </h5>
-              <ul style={{ margin: 0, paddingLeft: '26px', lineHeight: '1.6' }}>
-                <li>Mini-Festa</li>
-                <li>Pegue e Monte</li>
-                <li>Kit Mêsversário</li>
-              </ul>
-            </div>
-            <div>
-              <h5 style={{ 
-                color: '#dc2626', 
-                margin: '0 0 12px 0', 
-                fontSize: '15px', 
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <MdTrendingDown size={18} />
-                Categorias de Saída:
-              </h5>
-              <ul style={{ margin: 0, paddingLeft: '26px', lineHeight: '1.6' }}>
-                <li>Arco Redondo</li>
-                <li>Arco Romano</li>
-                <li>Bandejas</li>
-                <li>Capa Cilindro</li>
-              </ul>
-            </div>
+            <MdTrendingUp size={26} color="#fff" />
           </div>
-        </div>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: '17px', fontWeight: 700, color: '#065f46', marginBottom: '2px' }}>Nova Entrada</div>
+            <div style={{ fontSize: '13px', color: '#047857', opacity: 0.7 }}>Registrar receita</div>
+          </div>
+        </button>
+
+        {/* Botão Nova Saída */}
+        <button
+          onClick={handleAddSaida}
+          style={{
+            position: 'relative',
+            background: 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)',
+            border: '1px solid rgba(239,68,68,0.2)',
+            borderRadius: '16px',
+            padding: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            transition: 'all 0.3s ease',
+            overflow: 'hidden',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px)'
+            e.currentTarget.style.boxShadow = '0 12px 32px rgba(239,68,68,0.2)'
+            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = 'none'
+            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'
+          }}
+        >
+          <div style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 12px rgba(239,68,68,0.3)',
+          }}>
+            <MdTrendingDown size={26} color="#fff" />
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: '17px', fontWeight: 700, color: '#991b1b', marginBottom: '2px' }}>Nova Saída</div>
+            <div style={{ fontSize: '13px', color: '#b91c1c', opacity: 0.7 }}>Registrar despesa</div>
+          </div>
+        </button>
       </div>
 
       {/* Modal do Formulário */}
       <Modal
         isOpen={showForm}
         onClose={handleCloseForm}
-        title={transactionType === 'entrada' ? '💰 Nova Entrada' : '💸 Nova Saída'}
+        title={transactionType === 'entrada' ? 'Nova Entrada' : 'Nova Saída'}
+        subtitle={transactionType === 'entrada' ? 'Registrar uma nova receita' : 'Registrar uma nova despesa'}
+        variant={transactionType === 'entrada' ? 'entrada' : 'saida'}
+        icon={transactionType === 'entrada' ? <MdTrendingUp size={24} color="#fff" /> : <MdTrendingDown size={24} color="#fff" />}
         size="lg"
       >
         <TransactionForm
@@ -402,42 +346,16 @@ function FilteredTransactions() {
           onCancel={handleCloseForm}
           initialType={transactionType || undefined}
         />
-      </Modal>      {/* Lista de Transações */}
-      <div style={{
-        backgroundColor: '#FFFFFF',
-        borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
-        <TransactionList />
-      </div>
+      </Modal>
+
+      {/* Lista de Transações */}
+      <TransactionList />
     </div>
   )
 }
 
 function Settings() {
-  return (
-    <div>
-      <div style={{
-        backgroundColor: '#FFFFFF',
-        padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        marginBottom: '20px'
-      }}>
-        <h3 style={{ color: '#333', marginBottom: '15px' }}>Configurações do Sistema</h3>
-        <div style={{ color: '#666' }}>
-          <p>• Tema da aplicação</p>
-          <p>• Configurações de backup</p>
-          <p>• Preferências de relatório</p>
-          <p>• Configurações de notificação</p>
-        </div>
-      </div>
-      
-      {/* Componente de Teste de Conexão com Banco de Dados */}
-      <SupabaseConnectionTest />
-    </div>
-  )
+  return <SettingsPage />
 }
 
 export default App
