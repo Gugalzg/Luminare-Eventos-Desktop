@@ -17,9 +17,10 @@ import {
   AreaChart,
   Area
 } from 'recharts'
-import { format, startOfMonth, endOfMonth, subMonths, parseISO } from 'date-fns'
+import { format, startOfMonth, endOfMonth, subMonths, addMonths, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon } from 'lucide-react'
+import { MdCalendarToday } from 'react-icons/md'
 import './FinancialCharts.css'
 
 // Custom hooks for advanced animations
@@ -155,15 +156,21 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 
 const FinancialCharts: React.FC = () => {
   const { transactions } = useTransactions()
+  const [selectedMonth, setSelectedMonth] = useState(new Date())
 
-  // Dados para gráfico de pizza (transações por categoria no mês atual)
-  const currentMonth = new Date()
+  const isCurrentMonth = format(selectedMonth, 'yyyy-MM') === format(new Date(), 'yyyy-MM')
+
+  const goToPreviousMonth = () => setSelectedMonth(prev => subMonths(prev, 1))
+  const goToNextMonth = () => setSelectedMonth(prev => addMonths(prev, 1))
+  const goToCurrentMonth = () => setSelectedMonth(new Date())
+
+  // Dados para gráfico de pizza (transações por categoria do mês selecionado)
   const currentMonthTransactions = useMemo(() => {
     return transactions.filter(transaction => {
       const transactionDate = parseISO(transaction.date)
-      return transactionDate >= startOfMonth(currentMonth) && transactionDate <= endOfMonth(currentMonth)
+      return transactionDate >= startOfMonth(selectedMonth) && transactionDate <= endOfMonth(selectedMonth)
     })
-  }, [transactions, currentMonth])
+  }, [transactions, selectedMonth])
 
   const pieData = useMemo(() => {
     const categoryTotals = new Map<string, { name: string; total: number; color?: string }>()
@@ -186,7 +193,7 @@ const FinancialCharts: React.FC = () => {
   // Dados para gráfico de barras (evolução mensal dos últimos 6 meses)
   const monthlyData = useMemo(() => {
     return Array.from({ length: 6 }, (_, i) => {
-      const date = subMonths(currentMonth, i)
+      const date = subMonths(selectedMonth, i)
       const monthStart = startOfMonth(date)
       const monthEnd = endOfMonth(date)
       
@@ -210,7 +217,7 @@ const FinancialCharts: React.FC = () => {
         saldo: entradas - saidas
       }
     }).reverse()
-  }, [transactions, currentMonth])
+  }, [transactions, selectedMonth])
 
   // Dados para gráfico de linha (evolução do saldo)
   const balanceEvolution = useMemo(() => {
@@ -227,7 +234,7 @@ const FinancialCharts: React.FC = () => {
       })
   }, [transactions])
 
-  // Estatísticas resumidas
+  // Estatísticas resumidas do MÊS ATUAL
   const stats = useMemo(() => {
     const entradas = currentMonthTransactions
       .filter(t => t.type === 'entrada')
@@ -243,6 +250,47 @@ const FinancialCharts: React.FC = () => {
     return { entradas, saidas, saldo, totalTransactions }
   }, [currentMonthTransactions])
 
+  // Estatísticas TOTAIS (todas as transações)
+  const totalStats = useMemo(() => {
+    const entradas = transactions
+      .filter(t => t.type === 'entrada')
+      .reduce((sum, t) => sum + t.amount, 0)
+    
+    const saidas = transactions
+      .filter(t => t.type === 'saida')
+      .reduce((sum, t) => sum + t.amount, 0)
+
+    const saldo = entradas - saidas
+    const totalTransactions = transactions.length
+    const entradasCount = transactions.filter(t => t.type === 'entrada').length
+    const saidasCount = transactions.filter(t => t.type === 'saida').length
+
+    return { entradas, saidas, saldo, totalTransactions, entradasCount, saidasCount }
+  }, [transactions])
+
+  // Dados de categorias separados por tipo (para o Resumo por Categoria)
+  const categoryByType = useMemo(() => {
+    const entradasMap = new Map<string, number>()
+    const saidasMap = new Map<string, number>()
+
+    currentMonthTransactions.forEach(t => {
+      const map = t.type === 'entrada' ? entradasMap : saidasMap
+      map.set(t.category, (map.get(t.category) || 0) + t.amount)
+    })
+
+    const toSorted = (map: Map<string, number>) =>
+      Array.from(map.entries())
+        .map(([name, total]) => ({ name, total }))
+        .sort((a, b) => b.total - a.total)
+
+    return {
+      entradas: toSorted(entradasMap),
+      saidas: toSorted(saidasMap),
+      maxEntrada: Math.max(...Array.from(entradasMap.values()), 0),
+      maxSaida: Math.max(...Array.from(saidasMap.values()), 0),
+    }
+  }, [currentMonthTransactions])
+
   const formatCurrency = (value: number) => {
     return `R$ ${Math.abs(value).toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
@@ -256,7 +304,382 @@ const FinancialCharts: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Cards de Resumo - Layout Horizontal */}
+      {/* ===== SEÇÃO: RESUMO GERAL (TOTAIS) ===== */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)',
+        borderRadius: '20px',
+        padding: '32px 24px',
+        boxShadow: '0 10px 40px rgba(30, 27, 75, 0.3)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background decorative elements */}
+        <div style={{
+          position: 'absolute',
+          top: '-50px',
+          right: '-50px',
+          width: '200px',
+          height: '200px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)',
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-30px',
+          left: '-30px',
+          width: '150px',
+          height: '150px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)',
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h2 style={{
+            color: '#e0e7ff',
+            fontSize: '13px',
+            fontWeight: 600,
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            marginBottom: '8px',
+          }}>
+            📊 Resumo Geral
+          </h2>
+          <p style={{
+            color: 'rgba(199, 210, 254, 0.6)',
+            fontSize: '13px',
+            marginBottom: '28px',
+          }}>
+            Todas as transações • {totalStats.totalTransactions} operações registradas
+          </p>
+
+          {/* Cards de Totais Gerais */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '16px',
+            marginBottom: '24px',
+          }}>
+            {/* Total Entradas */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.08) 100%)',
+              border: '1px solid rgba(16,185,129,0.25)',
+              borderRadius: '16px',
+              padding: '20px 24px',
+              transition: 'all 0.3s ease',
+              cursor: 'default',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-3px)'
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(16,185,129,0.2)'
+              e.currentTarget.style.borderColor = 'rgba(16,185,129,0.5)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.borderColor = 'rgba(16,185,129,0.25)'
+            }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ color: '#6ee7b7', fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  Total Entradas
+                </span>
+                <div style={{
+                  background: 'rgba(16,185,129,0.2)',
+                  borderRadius: '10px',
+                  padding: '6px 10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <TrendingUp style={{ width: '14px', height: '14px', color: '#34d399' }} />
+                  <span style={{ color: '#34d399', fontSize: '11px', fontWeight: 600 }}>{totalStats.entradasCount}</span>
+                </div>
+              </div>
+              <p style={{
+                color: '#6ee7b7',
+                fontSize: '28px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                margin: 0,
+                textShadow: '0 0 30px rgba(16,185,129,0.3)',
+              }}>
+                <AnimatedNumber value={totalStats.entradas} formatter={formatCurrency} delay={100} />
+              </p>
+            </div>
+
+            {/* Total Saídas */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(220,38,38,0.08) 100%)',
+              border: '1px solid rgba(239,68,68,0.25)',
+              borderRadius: '16px',
+              padding: '20px 24px',
+              transition: 'all 0.3s ease',
+              cursor: 'default',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-3px)'
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(239,68,68,0.2)'
+              e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.borderColor = 'rgba(239,68,68,0.25)'
+            }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ color: '#fca5a5', fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  Total Saídas
+                </span>
+                <div style={{
+                  background: 'rgba(239,68,68,0.2)',
+                  borderRadius: '10px',
+                  padding: '6px 10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <TrendingDown style={{ width: '14px', height: '14px', color: '#f87171' }} />
+                  <span style={{ color: '#f87171', fontSize: '11px', fontWeight: 600 }}>{totalStats.saidasCount}</span>
+                </div>
+              </div>
+              <p style={{
+                color: '#fca5a5',
+                fontSize: '28px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                margin: 0,
+                textShadow: '0 0 30px rgba(239,68,68,0.3)',
+              }}>
+                <AnimatedNumber value={totalStats.saidas} formatter={formatCurrency} delay={200} />
+              </p>
+            </div>
+
+            {/* Saldo Total */}
+            <div style={{
+              background: totalStats.saldo >= 0
+                ? 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(124,58,237,0.08) 100%)'
+                : 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(217,119,6,0.08) 100%)',
+              border: `1px solid ${totalStats.saldo >= 0 ? 'rgba(139,92,246,0.25)' : 'rgba(245,158,11,0.25)'}`,
+              borderRadius: '16px',
+              padding: '20px 24px',
+              transition: 'all 0.3s ease',
+              cursor: 'default',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-3px)'
+              const color = totalStats.saldo >= 0 ? '139,92,246' : '245,158,11'
+              e.currentTarget.style.boxShadow = `0 8px 25px rgba(${color},0.2)`
+              e.currentTarget.style.borderColor = `rgba(${color},0.5)`
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
+              const color = totalStats.saldo >= 0 ? '139,92,246' : '245,158,11'
+              e.currentTarget.style.borderColor = `rgba(${color},0.25)`
+            }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{
+                  color: totalStats.saldo >= 0 ? '#c4b5fd' : '#fcd34d',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase'
+                }}>
+                  Saldo Geral
+                </span>
+                <div style={{
+                  background: totalStats.saldo >= 0 ? 'rgba(139,92,246,0.2)' : 'rgba(245,158,11,0.2)',
+                  borderRadius: '10px',
+                  padding: '6px 10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <DollarSign style={{ width: '14px', height: '14px', color: totalStats.saldo >= 0 ? '#a78bfa' : '#fbbf24' }} />
+                  <span style={{
+                    color: totalStats.saldo >= 0 ? '#a78bfa' : '#fbbf24',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                  }}>
+                    {totalStats.saldo >= 0 ? 'Positivo' : 'Negativo'}
+                  </span>
+                </div>
+              </div>
+              <p style={{
+                color: totalStats.saldo >= 0 ? '#c4b5fd' : '#fcd34d',
+                fontSize: '28px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                margin: 0,
+                textShadow: `0 0 30px ${totalStats.saldo >= 0 ? 'rgba(139,92,246,0.3)' : 'rgba(245,158,11,0.3)'}`,
+              }}>
+                {totalStats.saldo >= 0 ? '+' : '-'}
+                <AnimatedNumber value={Math.abs(totalStats.saldo)} formatter={formatCurrency} delay={300} />
+              </p>
+            </div>
+          </div>
+
+          {/* Barra de proporção Entradas vs Saídas */}
+          {totalStats.entradas + totalStats.saidas > 0 && (
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#6ee7b7', fontSize: '12px', fontWeight: 500 }}>
+                  Entradas {((totalStats.entradas / (totalStats.entradas + totalStats.saidas)) * 100).toFixed(1)}%
+                </span>
+                <span style={{ color: '#fca5a5', fontSize: '12px', fontWeight: 500 }}>
+                  Saídas {((totalStats.saidas / (totalStats.entradas + totalStats.saidas)) * 100).toFixed(1)}%
+                </span>
+              </div>
+              <div style={{
+                height: '8px',
+                borderRadius: '4px',
+                background: 'rgba(255,255,255,0.1)',
+                overflow: 'hidden',
+                display: 'flex',
+              }}>
+                <div style={{
+                  width: `${(totalStats.entradas / (totalStats.entradas + totalStats.saidas)) * 100}%`,
+                  background: 'linear-gradient(90deg, #10b981, #34d399)',
+                  borderRadius: '4px 0 0 4px',
+                  transition: 'width 1s ease',
+                }} />
+                <div style={{
+                  width: `${(totalStats.saidas / (totalStats.entradas + totalStats.saidas)) * 100}%`,
+                  background: 'linear-gradient(90deg, #ef4444, #f87171)',
+                  borderRadius: '0 4px 4px 0',
+                  transition: 'width 1s ease',
+                }} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ===== SEÇÃO: RESUMO MENSAL (Cards existentes) ===== */}
+      <div>
+        {/* Seletor de Mês */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          padding: '0 10px',
+        }}>
+          <h2 style={{
+            color: '#374151',
+            fontSize: '13px',
+            fontWeight: 600,
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            margin: 0,
+          }}>
+            📅 {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
+          </h2>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {!isCurrentMonth && (
+              <button
+                onClick={goToCurrentMonth}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 14px',
+                  borderRadius: '10px',
+                  border: '1.5px solid #e2e8f0',
+                  background: '#ffffff',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.borderColor = '#818cf8'; e.currentTarget.style.color = '#6366f1' }}
+                onMouseOut={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = '#64748b' }}
+              >
+                <MdCalendarToday size={14} />
+                Mês Atual
+              </button>
+            )}
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: '#f8fafc',
+              borderRadius: '12px',
+              border: '1.5px solid #e2e8f0',
+            }}>
+              <button
+                onClick={goToPreviousMonth}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '36px',
+                  height: '36px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  fontSize: '18px',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  borderRadius: '12px 0 0 12px',
+                  padding: 0,
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.background = '#e2e8f0'; e.currentTarget.style.color = '#1e293b' }}
+                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b' }}
+                title="Mês anterior"
+              >
+                ‹
+              </button>
+
+              <span style={{
+                padding: '0 12px',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: '#1e293b',
+                minWidth: '120px',
+                textAlign: 'center',
+                textTransform: 'capitalize',
+                borderLeft: '1px solid #e2e8f0',
+                borderRight: '1px solid #e2e8f0',
+                lineHeight: '36px',
+              }}>
+                {format(selectedMonth, 'MMM yyyy', { locale: ptBR })}
+              </span>
+
+              <button
+                onClick={goToNextMonth}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '36px',
+                  height: '36px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  fontSize: '18px',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  borderRadius: '0 12px 12px 0',
+                  padding: 0,
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.background = '#e2e8f0'; e.currentTarget.style.color = '#1e293b' }}
+                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b' }}
+                title="Próximo mês"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
@@ -427,13 +850,14 @@ const FinancialCharts: React.FC = () => {
           </EnhancedCard>
         </div>
       </div>
+      </div>
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Gráfico de Pizza - Gastos por Categoria */}
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold mb-4">
-            Gastos por Categoria - {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
+            Gastos por Categoria - {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
           </h3>
           {pieData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -532,30 +956,164 @@ const FinancialCharts: React.FC = () => {
       </div>
 
       {/* Resumo por Categoria */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <h3 className="text-lg font-semibold mb-4">
-          Resumo por Categoria - {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
-        </h3>
-        {pieData.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pieData.map((item) => (
-              <div key={item.name} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                <div className="flex items-center space-x-3">
-                  <div
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="font-medium text-gray-900">{item.name}</span>
-                </div>
-                <span className="font-bold text-gray-900">
-                  {formatCurrency(item.total)}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '16px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+        overflow: 'hidden',
+      }}>
+        {/* Header */}
+        <div style={{
+          padding: '24px 28px 20px',
+          borderBottom: '1px solid #f1f5f9',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#1e293b' }}>
+              Resumo por Categoria
+            </h3>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#94a3b8' }}>
+              {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })} • {currentMonthTransactions.length} transações
+            </p>
+          </div>
+          <div style={{
+            background: '#f1f5f9',
+            borderRadius: '10px',
+            padding: '8px 14px',
+            fontSize: '12px',
+            fontWeight: 600,
+            color: '#64748b',
+          }}>
+            <PieChartIcon style={{ width: 14, height: 14, display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />
+            Por Tipo
+          </div>
+        </div>
+
+        {categoryByType.entradas.length + categoryByType.saidas.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '200px' }}>
+            {/* Coluna Entradas */}
+            <div style={{ padding: '24px 28px', borderRight: '1px solid #f1f5f9' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '20px',
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#10b981',
+                  boxShadow: '0 0 8px rgba(16,185,129,0.4)',
+                }} />
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#10b981', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Entradas
+                </span>
+                <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: 'auto' }}>
+                  {categoryByType.entradas.length} {categoryByType.entradas.length === 1 ? 'categoria' : 'categorias'}
                 </span>
               </div>
-            ))}
+
+              {categoryByType.entradas.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {categoryByType.entradas.map((item, i) => (
+                    <div key={item.name} style={{ opacity: 0, animation: `fadeInUp 0.4s ease ${i * 0.08}s forwards` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 500, color: '#334155' }}>{item.name}</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#059669' }}>{formatCurrency(item.total)}</span>
+                      </div>
+                      <div style={{
+                        height: '6px',
+                        borderRadius: '3px',
+                        background: '#f1f5f9',
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          height: '100%',
+                          borderRadius: '3px',
+                          background: 'linear-gradient(90deg, #10b981, #34d399)',
+                          width: `${categoryByType.maxEntrada > 0 ? (item.total / categoryByType.maxEntrada) * 100 : 0}%`,
+                          transition: 'width 0.8s ease',
+                        }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', color: '#cbd5e1', fontSize: '13px' }}>
+                  Nenhuma entrada neste mês
+                </div>
+              )}
+            </div>
+
+            {/* Coluna Saídas */}
+            <div style={{ padding: '24px 28px' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '20px',
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  boxShadow: '0 0 8px rgba(239,68,68,0.4)',
+                }} />
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#ef4444', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Saídas
+                </span>
+                <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: 'auto' }}>
+                  {categoryByType.saidas.length} {categoryByType.saidas.length === 1 ? 'categoria' : 'categorias'}
+                </span>
+              </div>
+
+              {categoryByType.saidas.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {categoryByType.saidas.map((item, i) => (
+                    <div key={item.name} style={{ opacity: 0, animation: `fadeInUp 0.4s ease ${i * 0.08}s forwards` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 500, color: '#334155' }}>{item.name}</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#dc2626' }}>{formatCurrency(item.total)}</span>
+                      </div>
+                      <div style={{
+                        height: '6px',
+                        borderRadius: '3px',
+                        background: '#f1f5f9',
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          height: '100%',
+                          borderRadius: '3px',
+                          background: 'linear-gradient(90deg, #ef4444, #f87171)',
+                          width: `${categoryByType.maxSaida > 0 ? (item.total / categoryByType.maxSaida) * 100 : 0}%`,
+                          transition: 'width 0.8s ease',
+                        }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', color: '#cbd5e1', fontSize: '13px' }}>
+                  Nenhuma saída neste mês
+                </div>
+              )}
+            </div>
           </div>
         ) : (
-          <div className="text-center text-gray-500 py-8">
-            Nenhum gasto registrado neste mês
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '48px 24px',
+            color: '#94a3b8',
+          }}>
+            <PieChartIcon style={{ width: 40, height: 40, marginBottom: 12, opacity: 0.4 }} />
+            <span style={{ fontSize: '14px' }}>Nenhuma transação registrada neste mês</span>
           </div>
         )}
       </div>
