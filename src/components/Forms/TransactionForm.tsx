@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { MdSave, MdCancel, MdEdit } from 'react-icons/md';
+import { MdSave, MdCancel, MdEdit, MdTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { useTransactions } from '../../context/TransactionContext';
 import './TransactionForm.css';
 
@@ -93,9 +93,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     }
   };
 
+  const isEntrada = watchedType === 'entrada';
+  const accentColor = isEntrada ? '#059669' : '#dc2626';
+  const accentBg = isEntrada ? '#ecfdf5' : '#fef2f2';
+  const accentBorder = isEntrada ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)';
+
   return (
     <div className="transaction-form-compact">
-      {/* Header compacto apenas para edição */}
+      {/* Header compacto apenas para edição (fora de modal) */}
       {isEditing && (
         <div className="form-header-compact">
           <MdEdit className="header-icon" />
@@ -109,7 +114,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           {/* Título */}
           <div className="field-compact">
             <label className="label-compact">
-              📝 Título
+              Título
             </label>
             <input
               type="text"
@@ -130,7 +135,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           {/* Categoria */}
           <div className="field-compact">
             <label className="label-compact">
-              🏷️ Categoria
+              Categoria
             </label>
             <select
               {...register('category', { required: 'Selecione uma categoria' })}
@@ -139,7 +144,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               <option value="">
                 {watchedType 
                   ? "Selecione uma categoria" 
-                  : "Selecione primeiro um tipo de transação"
+                  : "Selecione primeiro um tipo"
                 }
               </option>
               {filteredCategories.map((category: any) => (
@@ -158,19 +163,32 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           {/* Valor */}
           <div className="field-compact">
             <label className="label-compact">
-              💰 Valor (R$)
+              Valor (R$)
             </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              {...register('amount', { 
-                required: 'Valor é obrigatório',
-                min: { value: 0.01, message: 'Valor deve ser maior que zero' }
-              })}
-              className={`input-compact input-value-compact ${errors.amount ? 'error' : ''}`}
-              placeholder="0,00"
-            />
+            <div className="input-value-wrapper" style={{ position: 'relative' }}>
+              <span style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '14px',
+                fontWeight: 700,
+                color: accentColor,
+                pointerEvents: 'none',
+              }}>R$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                {...register('amount', { 
+                  required: 'Valor é obrigatório',
+                  min: { value: 0.01, message: 'Valor deve ser maior que zero' }
+                })}
+                className={`input-compact input-value-compact ${errors.amount ? 'error' : ''}`}
+                placeholder="0,00"
+                style={{ paddingLeft: '42px' }}
+              />
+            </div>
             {errors.amount && (
               <div className="error-compact">
                 ⚠️ {errors.amount.message}
@@ -181,7 +199,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           {/* Data */}
           <div className="field-compact">
             <label className="label-compact">
-              📅 Data
+              Data
             </label>
             <input
               type="date"
@@ -198,36 +216,43 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           {/* Descrição - linha completa */}
           <div className="field-compact field-full">
             <label className="label-compact">
-              📄 Descrição (Opcional)
+              Descrição <span style={{ fontWeight: 400, color: '#94a3b8' }}>(Opcional)</span>
             </label>
             <textarea
               {...register('description')}
               className="input-compact textarea-compact"
-              placeholder="Descrição adicional..."
-              rows={2}
+              placeholder="Informações adicionais sobre a transação..."
+              rows={3}
             />
           </div>
         </div>
 
-        {/* Botões compactos */}
+        {/* Botões */}
         <div className="buttons-compact">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="button-compact success"
-          >
-            <MdSave className="button-icon" />
-            {isSubmitting ? 'Salvando...' : 'Salvar'}
-            {isSubmitting && <div className="spinner-compact"></div>}
-          </button>
-
           <button
             type="button"
             onClick={onCancel}
-            className="button-compact danger"
+            className="button-compact cancel"
           >
-            <MdCancel className="button-icon" />
             Cancelar
+          </button>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`button-compact submit ${isEntrada ? 'submit-entrada' : 'submit-saida'}`}
+          >
+            {isSubmitting ? (
+              <>
+                <div className="spinner-compact"></div>
+                Salvando...
+              </>
+            ) : (
+              <>
+                {isEntrada ? <MdTrendingUp size={18} /> : <MdTrendingDown size={18} />}
+                {isEditing ? 'Atualizar' : isEntrada ? 'Registrar Entrada' : 'Registrar Saída'}
+              </>
+            )}
           </button>
         </div>
       </form>
